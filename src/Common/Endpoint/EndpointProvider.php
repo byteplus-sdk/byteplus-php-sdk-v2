@@ -3,7 +3,7 @@ namespace Byteplus\Common\Endpoint;
 
 abstract class EndpointProvider
 {
-    abstract public function endpointFor($service, $region);
+    abstract public function endpointFor($service, $region, $customBootstrapRegion = null, $useDualStack = null);
 }
 
 class ResolvedEndpoint

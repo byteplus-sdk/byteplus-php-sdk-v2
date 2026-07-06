@@ -5,10 +5,21 @@ namespace Byteplus\Common\Endpoint\Providers;
 use Byteplus\Common\Endpoint\EndpointProvider;
 use Byteplus\Common\Endpoint\ResolvedEndpoint;
 
+define('OPEN_PREFIX', 'open');
+define('ENDPOINT_SUFFIX', '.byteplusapi.com');
+define('DUALSTACK_ENDPOINT_SUFFIX', '.byteplus-api.com');
+define('FALLBACK_ENDPOINT', OPEN_PREFIX . '.ap-southeast-1' . ENDPOINT_SUFFIX);
+define('OPEN_ENDPOINT', OPEN_PREFIX . ENDPOINT_SUFFIX);
+
+define('REGION_CODE_CN_BEIJING_AUTO_DRIVING', 'cn-beijing-autodriving');
+define('REGION_CODE_CN_SHANGHAI_AUTO_DRIVING', 'cn-shanghai-autodriving');
+define('REGION_CODE_CN_BEIJING_SELFDRIVE', 'cn-beijing-selfdrive');
+define('REGION_CODE_AP_SOUTHEAST2', 'ap-southeast-2');
+define('REGION_CODE_AP_SOUTHEAST3', 'ap-southeast-3');
+define('REGION_CODE_CN_HONGKONG', 'cn-hongkong');
 
 class DefaultEndpointProvider extends EndpointProvider
 {
-    // 默认端点配置
     public static $defaultEndpoint;
 
     private $customEndpoints;
@@ -18,505 +29,147 @@ class DefaultEndpointProvider extends EndpointProvider
         $this->customEndpoints = $customEndpoints ?: [];
     }
 
+    private static function ensureDefaultEndpoint()
+    {
+        if (self::$defaultEndpoint !== null) {
+            return;
+        }
+
+        self::$defaultEndpoint = [
+            'ark' => new ServiceEndpointInfo(
+                'ark',
+                false,
+                '',
+                [],
+                OPEN_ENDPOINT
+            ),
+            'billing' => new ServiceEndpointInfo(
+                'billing',
+                true,
+                '',
+                [],
+                OPEN_ENDPOINT
+            ),
+            'ecs' => new ServiceEndpointInfo(
+                'ecs',
+                false,
+                '',
+                []
+            ),
+            'vpc' => new ServiceEndpointInfo(
+                'vpc',
+                false,
+                '',
+                []
+            ),
+            'kms' => new ServiceEndpointInfo(
+                'kms',
+                false,
+                '',
+                []
+            ),
+            'eco_partner' => new ServiceEndpointInfo(
+                'eco_partner',
+                true,
+                '',
+                []
+            ),
+            'iam' => new ServiceEndpointInfo(
+                'iam',
+                true,
+                '',
+                []
+            ),
+            'cloudmonitor' => new ServiceEndpointInfo(
+                'cloudmonitor',
+                false,
+                '',
+                []
+            ),
+            'cpaas' => new ServiceEndpointInfo(
+                'cpaas',
+                true,
+                '',
+                []
+            ),
+            'vepfs' => new ServiceEndpointInfo(
+                'vepfs',
+                false,
+                '',
+                []
+            ),
+            'vke' => new ServiceEndpointInfo(
+                'vke',
+                false,
+                '',
+                []
+            ),
+            'kickart' => new ServiceEndpointInfo(
+                'kickart',
+                true,
+                '',
+                []
+            ),
+            'rds_mssql' => new ServiceEndpointInfo(
+                'rds_mssql',
+                false,
+                '',
+                []
+            ),
+            'sts' => new ServiceEndpointInfo(
+                'sts',
+                false,
+                '',
+                []
+            ),
+            'redis' => new ServiceEndpointInfo(
+                'redis',
+                false,
+                '',
+                []
+            ),
+            'vmp' => new ServiceEndpointInfo(
+                'vmp',
+                false,
+                '',
+                []
+            ),
+            'vs' => new ServiceEndpointInfo(
+                'vs',
+                true,
+                '',
+                []
+            ),
+            'resourcecenter' => new ServiceEndpointInfo(
+                'resourcecenter',
+                true,
+                '',
+                []
+            ),
+            'rds_mysql' => new ServiceEndpointInfo(
+                'rds_mysql',
+                false,
+                '',
+                []
+            ),
+            'privatelink' => new ServiceEndpointInfo(
+                'privatelink',
+                false,
+                '',
+                []
+            ),
+        ];
+    }
+
     public function getDefaultEndpoint($service, $region, $suffix = ENDPOINT_SUFFIX)
     {
-        if (self::$defaultEndpoint == null) {
-            self::$defaultEndpoint = [
-                'ecs' => new ServiceEndpointInfo(
-                    'ecs',
-                    false,
-                    '',
-                    []
-                ),
-                'billing' => new ServiceEndpointInfo(
-                    'billing',
-                    true,
-                    '',
-                    []
-                ),
-                'advdefence' => new ServiceEndpointInfo(
-                    'advdefence',
-                    true,
-                    '',
-                    []
-                ),
-                'alb' => new ServiceEndpointInfo(
-                    'alb',
-                    false,
-                    '',
-                    []
-                ),
-                'auto_scaling' => new ServiceEndpointInfo(
-                    'auto_scaling',
-                    false,
-                    '',
-                    []
-                ),
-                'bio' => new ServiceEndpointInfo(
-                    'bio',
-                    false,
-                    '',
-                    []
-                ),
-                'vedbm' => new ServiceEndpointInfo(
-                    'vedbm',
-                    false,
-                    '',
-                    []
-                ),
-                'pca' => new ServiceEndpointInfo(
-                    'pca',
-                    true,
-                    '',
-                    []
-                ),
-                'cloud_trail' => new ServiceEndpointInfo(
-                    'cloud_trail',
-                    false,
-                    '',
-                    []
-                ),
-                'nta' => new ServiceEndpointInfo(
-                    'nta',
-                    true,
-                    '',
-                    []
-                ),
-                'kms' => new ServiceEndpointInfo(
-                    'kms',
-                    false,
-                    '',
-                    []
-                ),
-                'tis' => new ServiceEndpointInfo(
-                    'tis',
-                    true,
-                    '',
-                    []
-                ),
-                'vei_api' => new ServiceEndpointInfo(
-                    'vei_api',
-                    true,
-                    '',
-                    []
-                ),
-                'rocketmq' => new ServiceEndpointInfo(
-                    'rocketmq',
-                    false,
-                    '',
-                    []
-                ),
-                'emr' => new ServiceEndpointInfo(
-                    'emr',
-                    false,
-                    '',
-                    []
-                ),
-                'iam' => new ServiceEndpointInfo(
-                    'iam',
-                    true,
-                    '',
-                    []
-                ),
-                'volc_observe' => new ServiceEndpointInfo(
-                    'volc_observe',
-                    false,
-                    '',
-                    []
-                ),
-                'vmp' => new ServiceEndpointInfo(
-                    'vmp',
-                    false,
-                    '',
-                    []
-                ),
-                'cen' => new ServiceEndpointInfo(
-                    'cen',
-                    true,
-                    '',
-                    []
-                ),
-                'escloud' => new ServiceEndpointInfo(
-                    'escloud',
-                    false,
-                    '',
-                    []
-                ),
-                'ml_platform' => new ServiceEndpointInfo(
-                    'ml_platform',
-                    false,
-                    '',
-                    []
-                ),
-                'vepfs' => new ServiceEndpointInfo(
-                    'vepfs',
-                    false,
-                    '',
-                    []
-                ),
-                'redis' => new ServiceEndpointInfo(
-                    'redis',
-                    false,
-                    '',
-                    []
-                ),
-                'filenas' => new ServiceEndpointInfo(
-                    'filenas',
-                    false,
-                    '',
-                    []
-                ),
-                'vefaas' => new ServiceEndpointInfo(
-                    'vefaas',
-                    false,
-                    '',
-                    []
-                ),
-                'vpn' => new ServiceEndpointInfo(
-                    'vpn',
-                    false,
-                    '',
-                    []
-                ),
-                'vod' => new ServiceEndpointInfo(
-                    'vod',
-                    false,
-                    '',
-                    []
-                ),
-                'fw_center' => new ServiceEndpointInfo(
-                    'fw_center',
-                    true,
-                    '',
-                    []
-                ),
-                'privatelink' => new ServiceEndpointInfo(
-                    'privatelink',
-                    false,
-                    '',
-                    []
-                ),
-                'rds_mssql' => new ServiceEndpointInfo(
-                    'rds_mssql',
-                    false,
-                    '',
-                    []
-                ),
-                'waf' => new ServiceEndpointInfo(
-                    'waf',
-                    true,
-                    '',
-                    []
-                ),
-                'mongodb' => new ServiceEndpointInfo(
-                    'mongodb',
-                    false,
-                    '',
-                    []
-                ),
-                'smc' => new ServiceEndpointInfo(
-                    'smc',
-                    true,
-                    '',
-                    []
-                ),
-                'rds_mysql' => new ServiceEndpointInfo(
-                    'rds_mysql',
-                    false,
-                    '',
-                    []
-                ),
-                'seccenter' => new ServiceEndpointInfo(
-                    'seccenter',
-                    true,
-                    '',
-                    []
-                ),
-                'mcdn' => new ServiceEndpointInfo(
-                    'mcdn',
-                    true,
-                    '',
-                    []
-                ),
-                'dataleap' => new ServiceEndpointInfo(
-                    'dataleap',
-                    false,
-                    '',
-                    []
-                ),
-                'edx' => new ServiceEndpointInfo(
-                    'edx',
-                    true,
-                    '',
-                    []
-                ),
-                'natgateway' => new ServiceEndpointInfo(
-                    'natgateway',
-                    false,
-                    '',
-                    []
-                ),
-                'rabbitmq' => new ServiceEndpointInfo(
-                    'rabbitmq',
-                    false,
-                    '',
-                    []
-                ),
-                'httpdns' => new ServiceEndpointInfo(
-                    'httpdns',
-                    true,
-                    '',
-                    []
-                ),
-                'translate' => new ServiceEndpointInfo(
-                    'translate',
-                    true,
-                    '',
-                    []
-                ),
-                'cr' => new ServiceEndpointInfo(
-                    'cr',
-                    false,
-                    '',
-                    []
-                ),
-                'spark' => new ServiceEndpointInfo(
-                    'spark',
-                    true,
-                    '',
-                    []
-                ),
-                'cdn' => new ServiceEndpointInfo(
-                    'cdn',
-                    true,
-                    '',
-                    []
-                ),
-                'clb' => new ServiceEndpointInfo(
-                    'clb',
-                    false,
-                    '',
-                    []
-                ),
-                'cv' => new ServiceEndpointInfo(
-                    'cv',
-                    true,
-                    '',
-                    []
-                ),
-                'tag' => new ServiceEndpointInfo(
-                    'tag',
-                    true,
-                    '',
-                    []
-                ),
-                'vke' => new ServiceEndpointInfo(
-                    'vke',
-                    false,
-                    '',
-                    []
-                ),
-                'mcs' => new ServiceEndpointInfo(
-                    'mcs',
-                    false,
-                    '',
-                    []
-                ),
-                'flink' => new ServiceEndpointInfo(
-                    'flink',
-                    false,
-                    '',
-                    []
-                ),
-                'kafka' => new ServiceEndpointInfo(
-                    'kafka',
-                    false,
-                    '',
-                    []
-                ),
-                'rds_postgresql' => new ServiceEndpointInfo(
-                    'rds_postgresql',
-                    false,
-                    '',
-                    []
-                ),
-                'sts' => new ServiceEndpointInfo(
-                    'sts',
-                    false,
-                    '',
-                    []
-                ),
-                'ark' => new ServiceEndpointInfo(
-                    'ark',
-                    false,
-                    '',
-                    []
-                ),
-                'transitrouter' => new ServiceEndpointInfo(
-                    'transitrouter',
-                    false,
-                    '',
-                    []
-                ),
-                'cloud_detect' => new ServiceEndpointInfo(
-                    'cloud_detect',
-                    true,
-                    '',
-                    []
-                ),
-                'vpc' => new ServiceEndpointInfo(
-                    'vpc',
-                    false,
-                    '',
-                    []
-                ),
-                'certificate_service' => new ServiceEndpointInfo(
-                    'certificate_service',
-                    true,
-                    '',
-                    []
-                ),
-                'dms' => new ServiceEndpointInfo(
-                    'dms',
-                    false,
-                    '',
-                    []
-                ),
-                'dns' => new ServiceEndpointInfo(
-                    'dns',
-                    true,
-                    '',
-                    []
-                ),
-                'directconnect' => new ServiceEndpointInfo(
-                    'directconnect',
-                    false,
-                    '',
-                    []
-                ),
-                'storage_ebs' => new ServiceEndpointInfo(
-                    'storage_ebs',
-                    false,
-                    '',
-                    []
-                ),
-                'quota' => new ServiceEndpointInfo(
-                    'quota',
-                    true,
-                    '',
-                    []
-                ),
-                'fasttrack' => new ServiceEndpointInfo(
-                    'fasttrack',
-                    false,
-                    '',
-                    []
-                ),
-                'acep' => new ServiceEndpointInfo(
-                    'acep',
-                    true,
-                    '',
-                    []
-                ),
-                'private_zone' => new ServiceEndpointInfo(
-                    'private_zone',
-                    true,
-                    '',
-                    []
-                ),
-                'sqs' => new ServiceEndpointInfo(
-                    'sqs',
-                    false,
-                    '',
-                    []
-                ),
-                'resourcecenter' => new ServiceEndpointInfo(
-                    'resourcecenter',
-                    true,
-                    '',
-                    []
-                ),
-                'cfs' => new ServiceEndpointInfo(
-                    'cfs',
-                    false,
-                    '',
-                    []
-                ),
-                'cloudidentity' => new ServiceEndpointInfo(
-                    'cloudidentity',
-                    false,
-                    '',
-                    []
-                ),
-                'livesaas' => new ServiceEndpointInfo(
-                    'livesaas',
-                    true,
-                    '',
-                    []
-                ),
-            
-                'cloudmonitor' => new ServiceEndpointInfo(
-                    'cloudmonitor',
-                    false,
-                    '',
-                    []
-                ),
-                
-                'i18n_openapi' => new ServiceEndpointInfo(
-                    'i18n_openapi',
-                    true,
-                    '',
-                    []
-                ),
-                
-                'arkclaw' => new ServiceEndpointInfo(
-                    'arkclaw',
-                    false,
-                    '',
-                    []
-                ),
-                
-                'insight' => new ServiceEndpointInfo(
-                    'insight',
-                    true,
-                    '',
-                    []
-                ),
-                
-                'cbr' => new ServiceEndpointInfo(
-                    'cbr',
-                    false,
-                    '',
-                    []
-                ),
-            
-                'config' => new ServiceEndpointInfo(
-                    'config',
-                    true,
-                    '',
-                    []
-                ),
-            
-                'organization' => new ServiceEndpointInfo(
-                    'organization',
-                    true,
-                    '',
-                    []
-                ),
-            
-                'milvus' => new ServiceEndpointInfo(
-                    'milvus',
-                    false,
-                    '',
-                    []
-                ),
-            ];
+        self::ensureDefaultEndpoint();
+
+        if (array_key_exists($service, self::$defaultEndpoint)) {
+            $endpointInfo = self::$defaultEndpoint[$service];
+            return $endpointInfo->getEndpointFor($region, $suffix);
         }
-        $defaultEndpoint = self::$defaultEndpoint;
-        if (isset($defaultEndpoint[$service])) {
-            $e = $defaultEndpoint[$service];
-            return $e->getEndpointFor($region, $suffix);
-        }
+
         return FALLBACK_ENDPOINT;
     }
 
@@ -538,7 +191,7 @@ class DefaultEndpointProvider extends EndpointProvider
                         return true;
                     }
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 trigger_error(
                     'failed to read bootstrap region list from file ' . $bsRegionListPath . ': ' . $e->getMessage(),
                     E_USER_WARNING
@@ -547,19 +200,15 @@ class DefaultEndpointProvider extends EndpointProvider
         }
 
         $bootstrapRegion = [
-            REGION_CODE_CN_BEIJING_AUTO_DRIVING => [],
             REGION_CODE_AP_SOUTHEAST2 => [],
             REGION_CODE_AP_SOUTHEAST3 => [],
-            REGION_CODE_CN_SHANGHAI_AUTO_DRIVING => [],
-            REGION_CODE_CN_BEIJING_SELFDRIVE => [],
         ];
-        if ($bootstrapRegion) {
-            if (isset($bootstrapRegion[$regionCode])) {
-                return true;
-            }
+        if ($bootstrapRegion && array_key_exists($regionCode, $bootstrapRegion)) {
+            return true;
         }
+
         if ($customBootstrapRegion) {
-            return isset($customBootstrapRegion[$regionCode]);
+            return is_array($customBootstrapRegion) && array_key_exists($regionCode, $customBootstrapRegion);
         }
 
         return false;
@@ -568,14 +217,15 @@ class DefaultEndpointProvider extends EndpointProvider
     private static function hasEnabledDualstack($useDualStack)
     {
         if ($useDualStack === null) {
-            return getenv("BYTEPLUS_ENABLE_DUALSTACK") == 'true';
+            return getenv('BYTEPLUS_ENABLE_DUALSTACK') == 'true';
         }
+
         return $useDualStack;
     }
 
     public function endpointFor($service, $region, $customBootstrapRegion = null, $useDualStack = null)
     {
-        if (isset($this->customEndpoints[$service])) {
+        if (is_array($this->customEndpoints) && array_key_exists($service, $this->customEndpoints)) {
             $conf = $this->customEndpoints[$service];
             $host = $conf->getEndpointFor($region);
             return new ResolvedEndpoint($host);
@@ -586,15 +236,21 @@ class DefaultEndpointProvider extends EndpointProvider
         }
 
         if (!$this->inBootstrapRegionList($region, $customBootstrapRegion)) {
-            return new ResolvedEndpoint(FALLBACK_ENDPOINT);
+            self::ensureDefaultEndpoint();
+
+            if (!array_key_exists($service, self::$defaultEndpoint)) {
+                return new ResolvedEndpoint(FALLBACK_ENDPOINT);
+            }
+
+            return new ResolvedEndpoint(self::$defaultEndpoint[$service]->fallbackEndpoint);
         }
+
         $suffix = self::hasEnabledDualstack($useDualStack) ? DUALSTACK_ENDPOINT_SUFFIX : ENDPOINT_SUFFIX;
         $host = $this->getDefaultEndpoint($service, $region, $suffix);
 
         return new ResolvedEndpoint($host);
     }
 }
-
 
 class ServiceEndpointInfo
 {
@@ -604,13 +260,13 @@ class ServiceEndpointInfo
     public $regionEndpointMap;
     public $fallbackEndpoint;
 
-    public function __construct($service, $isGlobal, $globalEndpoint, $regionEndpointMap, $fallbackEndpoint = 'open.byteplusapi.com')
+    public function __construct($service, $isGlobal, $globalEndpoint, $regionEndpointMap, $fallbackEndpoint = null)
     {
         $this->service = $service;
         $this->isGlobal = $isGlobal;
         $this->globalEndpoint = $globalEndpoint;
-        $this->regionEndpointMap = $regionEndpointMap;
-        $this->fallbackEndpoint = $fallbackEndpoint;
+        $this->regionEndpointMap = $regionEndpointMap ?: [];
+        $this->fallbackEndpoint = $fallbackEndpoint === null ? FALLBACK_ENDPOINT : $fallbackEndpoint;
     }
 
     private function getStandardizeDomainServiceCode()
@@ -618,35 +274,41 @@ class ServiceEndpointInfo
         return strtolower(str_replace('_', '-', $this->service));
     }
 
-    public function getEndpointFor($region, $suffix = '.byteplusapi.com')
+    private static function isCnRegion($region)
+    {
+        if (strpos($region, 'cn-') !== 0) {
+            return false;
+        }
+
+        $cnNoneMainlandRegion = [
+            REGION_CODE_CN_HONGKONG => [],
+        ];
+
+        return !array_key_exists($region, $cnNoneMainlandRegion);
+    }
+
+    public function getEndpointFor($region, $suffix = ENDPOINT_SUFFIX)
     {
         if ($this->isGlobal) {
             if ($this->globalEndpoint) {
                 return $this->globalEndpoint;
             }
+
             return $this->getStandardizeDomainServiceCode() . $suffix;
         }
 
-        if (isset($this->regionEndpointMap[$region])) {
+        if (array_key_exists($region, $this->regionEndpointMap)) {
             return $this->regionEndpointMap[$region];
         }
 
-        return $this->getStandardizeDomainServiceCode() . '.' . $region . $suffix;
+        $endpoint = $this->getStandardizeDomainServiceCode() . '.' . $region . $suffix;
+        if (self::isCnRegion($region)) {
+            $endpoint .= '.cn';
+        }
+
+        return $endpoint;
     }
 }
-
-// 定义常量
-define('OPEN_PREFIX', 'open');
-define('ENDPOINT_SUFFIX', '.byteplusapi.com');
-define('DUALSTACK_ENDPOINT_SUFFIX', '.byteplus-api.com');
-define('FALLBACK_ENDPOINT', OPEN_PREFIX . ENDPOINT_SUFFIX);
-
-// 区域代码常量
-define('REGION_CODE_CN_BEIJING_AUTO_DRIVING', 'cn-beijing-autodriving');
-define('REGION_CODE_CN_SHANGHAI_AUTO_DRIVING', 'cn-shanghai-autodriving');
-define('REGION_CODE_CN_BEIJING_SELFDRIVE', 'cn-beijing-selfdrive');
-define('REGION_CODE_AP_SOUTHEAST2', 'ap-southeast-2');
-define('REGION_CODE_AP_SOUTHEAST3', 'ap-southeast-3');
 
 class HostEndpointProvider extends EndpointProvider
 {
@@ -657,7 +319,7 @@ class HostEndpointProvider extends EndpointProvider
         $this->host = $host;
     }
 
-    public function endpointFor($service, $region)
+    public function endpointFor($service, $region, $customBootstrapRegion = null, $useDualStack = null)
     {
         return new ResolvedEndpoint($this->host);
     }

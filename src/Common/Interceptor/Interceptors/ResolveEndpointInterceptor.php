@@ -27,7 +27,15 @@ class ResolveEndpointInterceptor extends Interceptor
             $context->request->host = $endpointResolver->host;
             $prefix = $endpointResolver->urlFor($schema);
         } else {
-            $prefix = $schema . '://' . $host;
+            if (strpos($host, 'https://') === 0) {
+                $prefix = $host;
+                $context->request->host = substr($host, strlen('https://'));
+            } elseif (strpos($host, 'http://') === 0) {
+                $prefix = $host;
+                $context->request->host = substr($host, strlen('http://'));
+            } else {
+                $prefix = $schema . '://' . $host;
+            }
         }
 
         $context->request->url = $prefix . $context->request->truePath;

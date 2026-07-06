@@ -12,8 +12,8 @@ class Configuration
 
     protected $schema = 'https';
     protected $endpointProvider;
-    protected $customBootstrapRegion = '';
-    protected $useDualStack = false;
+    protected $customBootstrapRegion = null;
+    protected $useDualStack = null;
     protected $autoRetry = false;
     protected $credentialProvider;
     protected $runtimeOptions = '';
