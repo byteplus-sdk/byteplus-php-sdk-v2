@@ -44,8 +44,8 @@ class DefaultEndpointProvider extends EndpointProvider
                 OPEN_ENDPOINT
             ),
             'billing' => new ServiceEndpointInfo(
-                'billing',
-                true,
+                    'billing',
+                    true,
                 '',
                 [],
                 OPEN_ENDPOINT
