@@ -57,8 +57,8 @@ class DefaultEndpointProvider extends EndpointProvider
                 []
             ),
             'vpc' => new ServiceEndpointInfo(
-                'vpc',
-                false,
+                    'vpc',
+                    false,
                 '',
                 []
             ),
