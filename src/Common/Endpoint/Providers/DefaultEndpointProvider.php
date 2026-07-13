@@ -51,8 +51,8 @@ class DefaultEndpointProvider extends EndpointProvider
                 OPEN_ENDPOINT
             ),
             'ecs' => new ServiceEndpointInfo(
-                'ecs',
-                false,
+                    'ecs',
+                    false,
                 '',
                 []
             ),
