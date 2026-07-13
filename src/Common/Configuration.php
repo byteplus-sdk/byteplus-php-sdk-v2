@@ -31,7 +31,7 @@ class Configuration
     protected $connectTimeout = 30;
     protected $readTimeout = 30;
 
-    protected $userAgent = 'byteplus-php-sdk-v2/1.0.0';
+    protected $userAgent = 'byteplus-php-sdk-v2/1.0.1';
 
     /**
      * Debug switch (default set to false)

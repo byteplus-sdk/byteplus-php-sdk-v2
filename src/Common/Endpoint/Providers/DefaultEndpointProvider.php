@@ -75,8 +75,8 @@ class DefaultEndpointProvider extends EndpointProvider
                 []
             ),
             'iam' => new ServiceEndpointInfo(
-                'iam',
-                true,
+                    'iam',
+                    false,
                 '',
                 []
             ),
