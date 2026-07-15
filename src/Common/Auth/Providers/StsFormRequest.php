@@ -20,7 +20,7 @@ use Byteplus\Common\ApiException;
  */
 class StsFormRequest
 {
-    const DEFAULT_STS_ENDPOINT = 'sts.byteplusapi.com';
+    const DEFAULT_STS_ENDPOINT = 'sts.ap-southeast-1.byteplusapi.com';
     const DEFAULT_CONNECT_TIMEOUT = 5;
     const DEFAULT_TIMEOUT = 30;
     const DEFAULT_MAX_RETRIES = 3;
@@ -33,11 +33,11 @@ class StsFormRequest
     /**
      * Send a form-encoded POST to the STS endpoint with retry.
      *
-     * @param string $endpoint       bare host (e.g. sts.byteplusapi.com)
+     * @param string $endpoint       bare host (e.g. sts.ap-southeast-1.byteplusapi.com)
      * @param string $schema         'http' or 'https'
      * @param array  $queryParams    query string params (e.g. Action, Version, Policy for OIDC)
      * @param string $formBody       URL-encoded form body (http_build_query result)
-     * @param int    $maxRetries     extra retry attempts; 0 = no retry (single attempt)
+     * @param int    $maxRetries     total attempts, including the first; values below 1 become 1
      * @param int    $retryInterval  seconds between retries
      * @param string $providerName   provider name for error messages
      * @return string response body
@@ -54,8 +54,9 @@ class StsFormRequest
     ) {
         $url = self::buildRequestUrl($endpoint, $schema, $queryParams);
 
+        $attempts = max((int) $maxRetries, 1);
         $lastException = null;
-        for ($attempt = 0; $attempt <= $maxRetries; $attempt++) {
+        for ($attempt = 0; $attempt < $attempts; $attempt++) {
             try {
                 return self::doPost($url, $formBody, $providerName);
             } catch (ApiException $e) {
@@ -63,7 +64,7 @@ class StsFormRequest
                     throw $e;
                 }
                 $lastException = $e;
-                if ($attempt < $maxRetries) {
+                if ($attempt < $attempts - 1) {
                     sleep($retryInterval);
                 }
             }

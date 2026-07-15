@@ -88,10 +88,12 @@ class DefaultCredentialProvider extends Provider
         // Step 3: CLI config.json
         $chain[] = new CLIConfigCredentialProvider();
 
-        // Step 4: ECS Role (IMDS) (lazy - may throw if disabled)
-        $chain[] = new LazyProvider(function () use ($roleName) {
-            return EcsRoleCredentialProvider::create($roleName);
-        });
+        // Step 4: ECS Role (IMDS), omitted when metadata access is disabled.
+        if (strtolower((string) getenv('BYTEPLUS_ECS_METADATA_DISABLED')) !== 'true') {
+            $chain[] = new LazyProvider(function () use ($roleName) {
+                return EcsRoleCredentialProvider::create($roleName);
+            });
+        }
 
         return $chain;
     }

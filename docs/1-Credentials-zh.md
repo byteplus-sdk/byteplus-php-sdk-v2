@@ -11,7 +11,7 @@ Byteplus PHP SDK 同时支持显式凭证配置，以及基于 `CredentialProvid
 | Provider | 用途 | 是否自动刷新 | 典型场景 |
 | --- | --- | --- | --- |
 | 直接在 `Configuration` 中设置 `AK/SK` 或 `AK/SK/Token` | 显式传入固定或临时凭证 | 否 | 简单服务端接入 |
-| `StsProvider` | STS AssumeRole | 否 | 基于角色的临时凭证（每次调用都请求 STS，需调用方自行缓存） |
+| `StsProvider` | STS AssumeRole | 是 | 基于角色的临时凭证 |
 | `OidcCredentialProvider` | STS AssumeRoleWithOIDC | 是 | OIDC 联邦身份 |
 | `SamlCredentialProvider` | STS AssumeRoleWithSAML | 是 | SAML 联邦身份 |
 | `EnvironmentVariableCredentialProvider` | 从环境变量读取 | 否 | CI/CD、容器注入 |
@@ -110,7 +110,7 @@ try {
 
 ### AssumeRole
 
-动态访问凭证信息。`StsProvider::getCredentials()` 每次调用都会请求 STS `AssumeRole` 并返回响应中的 `Result.Credentials`，自身不维护本地缓存或过期前刷新窗口。该 provider 只处理 HTTP 状态和 STS 返回的 `ResponseMetadata.Error`，不会额外校验响应 JSON 中的 `Credentials` 字段完整性。
+动态访问凭证信息。`StsProvider::getCredentials()` 会缓存 STS `AssumeRole` 返回的凭证，并在 `ExpiredTime` 前 60 秒刷新，同时校验必需字段并对临时失败进行重试。默认 endpoint 为 `sts.ap-southeast-1.byteplusapi.com`，签名 region 为 `ap-southeast-1`。
 
 > ⚠️ **注意事项**
 >
@@ -127,10 +127,10 @@ $sts = new \Byteplus\Common\Auth\Providers\StsProvider(
     "Your sk", # 必填，子账号的sk
     "Your role name",  # 必填，子账号的角色TRN，如trn:iam::2110400000:role/role123  ,此处填写role123
     "Your account id",  # 必填，子账号的角色TRN，如trn:iam::2110400000:role/role123  ,此处填写2110400000
-    "cn-beijing", # 非必填，请求服务器区域地址，默认cn-north-1
+    "ap-southeast-1", # 非必填，请求服务器区域地址，默认 ap-southeast-1
     "3600", # 非必填，有效期默认3600秒
     "https", # 非必填，域名前缀，默认https
-    "sts.byteplusapi.com", # 非必填，请求域名，默认sts.byteplusapi.com
+    "sts.ap-southeast-1.byteplusapi.com", # 非必填，请求域名，默认值如左
     '{"Statement":[{"Effect":"Allow","Action":["vpc:CreateVpc"],"Resource":["*"],"Condition":{"StringEquals":{"byteplus:RequestedRegion":["cn-beijing"]}}}]}' # 非必填，授权策略，默认为空
 );
 
@@ -156,7 +156,7 @@ try {
 
 ### OIDC 凭证提供者
 
-`OidcCredentialProvider` 通过 STS AssumeRoleWithOIDC 获取临时凭证并缓存复用，在到期前自动刷新。过期时间优先使用 STS 返回的 `Expiration`；若响应中未携带该字段，则按本地 `durationSeconds` 估算。建议把 `durationSeconds` 设得略短，留出网络与时钟漂移余量。
+`OidcCredentialProvider` 通过 STS AssumeRoleWithOIDC 获取临时凭证并缓存复用，在到期前 60 秒自动刷新。支持 STS 返回的 `Expiration` 或 `ExpiredTime`；若响应没有有效的服务端过期时间则拒绝该响应。
 
 支持的 OIDC 环境变量：
 
@@ -177,12 +177,12 @@ $provider = new \Byteplus\Common\Auth\Providers\OidcCredentialProvider(
     "/var/run/secrets/oidc/token",           // oidcTokenFile（必填）
     "credentials-php-demo",                  // roleSessionName（可选）
     null,                                    // rolePolicy（可选）
-    "sts.byteplusapi.com"                  // stsEndpoint（可选）
+    "sts.ap-southeast-1.byteplusapi.com" // stsEndpoint（可选，左侧为默认值）
 );
 
 // 可选：通过 fluent setter 调整重试和传输参数
 // $provider->setSchema('https')       // 'http' 或 'https'，默认 'https'
-//          ->setMaxRetries(3)          // 额外重试次数；0 = 不重试，默认 3
+//          ->setMaxRetries(3)          // 总尝试次数（包含首次），最小为 1
 //          ->setRetryInterval(1);      // 重试间隔秒数，默认 1
 
 $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
@@ -208,7 +208,7 @@ $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
 
 ### SAML 凭证提供者
 
-`SamlCredentialProvider` 通过 SAML 2.0 IdP 返回的 SAML 断言调用 STS `AssumeRoleWithSAML` 接口换取临时凭证并缓存复用，在到期前自动刷新。过期时间按本地 `durationSeconds` 估算；建议把 `durationSeconds` 设得略短，留出网络与时钟漂移余量。
+`SamlCredentialProvider` 通过 SAML 2.0 IdP 返回的 SAML 断言调用 STS `AssumeRoleWithSAML` 换取临时凭证。请求会生成 `RoleSessionName`，凭证按服务端返回的 `Expiration` 或 `ExpiredTime` 缓存，并在到期前 60 秒刷新。
 
 > ⚠️ **注意事项**
 >
@@ -226,12 +226,12 @@ $provider = new \Byteplus\Common\Auth\Providers\SamlCredentialProvider(
     "MyIdp",                                   // SAML provider 名称（必填）
     "BASE64_ENCODED_SAML_RESPONSE_FROM_IDP",   // SAML assertion（必填）
     null,                                      // role policy（可选）
-    "sts.byteplusapi.com"                    // sts endpoint（可选）
+    "sts.ap-southeast-1.byteplusapi.com"   // sts endpoint（可选，左侧为默认值）
 );
 
 // 可选：通过 fluent setter 调整重试和传输参数
 // $provider->setSchema('https')       // 'http' 或 'https'，默认 'https'
-//          ->setMaxRetries(3)          // 额外重试次数；0 = 不重试，默认 3
+//          ->setMaxRetries(3)          // 总尝试次数（包含首次），最小为 1
 //          ->setRetryInterval(1);      // 重试间隔秒数，默认 1
 
 $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
@@ -295,18 +295,14 @@ $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
 
 #### 运行时刷新行为（sso / console-login）
 
-`sso` 与 `console-login` 模式下，SDK 在当前 PHP 进程中会在 access token 进入到期窗口（到期前 60 秒）时自动续期。由于 PHP 进程通常很短命，本 SDK 的刷新契约与 Go / Java / Python SDK 略有不同：
+`sso` 与 `console-login` 模式下，SDK 会自动续期已过期的 access token，并在当前 PHP 进程中维护刷新后的状态，行为与 Python SDK 一致：
 
 - **对象级内存缓存**：单个 `CLIConfigCredentialProvider` 实例会在对象生命周期内（同一次 PHP 请求中）缓存已解析的凭证，同一请求内多次调用 API 复用同一份 STS。
-- **磁盘协同跨进程刷新**：SDK **会**通过 atomic rename 将刷新后的 token 写回缓存文件（`~/.byteplus/sso/cache/<sha1>.json` 或 `~/.byteplus/login/cache/<sha1(login_session)>.json`），让并发 PHP 进程和 byteplus-cli 之间共享最新的 `refresh_token`。这与长生命周期的 Go / Java / Python SDK（纯内存维护刷新状态）相反，是 PHP 短请求生命周期下的正确折中。
-- **`refresh_token` 轮换**：当服务端返回 HTTP 400 `invalid_grant` 时，SDK 会重新读取一次缓存文件，比较磁盘 `refresh_token` 与内存中的差异，若不同则用磁盘上的最新 token 再尝试一次刷新。这覆盖了并发 `bp login`（或其他 PHP 进程）刚刚轮换过 token 的场景；若磁盘上同样没有更新的 token，SDK 会抛出 `ApiException` 并附带 `please run 'bp login'` / `'bp sso login'` 提示。
+- **CLI 独占磁盘写入**：SDK 不会写回 SSO 或 console-login 缓存，磁盘缓存仅由 `bp login` / `bp sso login` 更新。
+- **Console-login 轮换恢复**：服务端返回 HTTP 400 `invalid_grant` 时，console-login provider 会重新读取一次磁盘缓存；只有发现不同的 refresh token 才会重试。SSO 会直接暴露刷新失败，与 Python 行为一致。
 - **可操作的错误信息**：所有需要重新登录的错误路径都包含 `'bp login'`（console-login）或 `'bp sso login'`（sso），便于调用方向用户清晰说明下一步。
 
 ### ECS 角色凭证提供者
-
-> 🚨 **当前版本限制**
->
-> **当前版本暂不支持从 IMDS 自动探测角色名**，请通过构造参数或 `BYTEPLUS_ECS_METADATA` 环境变量显式传入角色名。后续版本将支持自动探测，敬请关注版本发布通知。
 
 `EcsRoleCredentialProvider` 从 ECS IMDS 中读取临时凭证。
 
@@ -320,7 +316,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 $provider = \Byteplus\Common\Auth\Providers\EcsRoleCredentialProvider::create("your-ecs-role-name");
 
 // 可选：通过 fluent setter 调整重试和超时参数
-// $provider->setMaxRetries(3)            // 额外重试次数；0 = 不重试，默认 3
+// $provider->setMaxRetries(3)            // 总尝试次数（包含首次），最小为 1
 //          ->setRetryInterval(1)          // 重试间隔秒数，默认 1
 //          ->setConnectTimeout(1)         // 连接超时秒数，默认 1
 //          ->setReadTimeout(1)            // 读取超时秒数，默认 1

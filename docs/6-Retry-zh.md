@@ -14,6 +14,9 @@ PHP SDK 目前没有为 `VPCApi` 等服务客户端发起的业务 API 请求提
 - OIDC 和 SAML STS 凭证 Provider 会重试网络错误、HTTP 429、HTTP 5xx
   等临时性 STS 失败。
 
+凭证 Provider 中，`setMaxRetries(3)` 表示包含首次请求在内共尝试三次，
+与 Python SDK 的语义一致。
+
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');

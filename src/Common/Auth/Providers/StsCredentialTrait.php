@@ -27,15 +27,12 @@ trait StsCredentialTrait
     }
 
     /**
-     * @param int $maxRetries extra retry attempts; 0 = no retry
+     * @param int $maxRetries total attempts, including the first
      * @return $this
      */
     public function setMaxRetries($maxRetries)
     {
-        if ($maxRetries < 0) {
-            throw new \InvalidArgumentException('maxRetries must be >= 0');
-        }
-        $this->maxRetries = $maxRetries;
+        $this->maxRetries = max((int) $maxRetries, 1);
         return $this;
     }
 

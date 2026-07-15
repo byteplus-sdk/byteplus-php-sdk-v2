@@ -112,9 +112,6 @@ class CLIConfigCredentialProvider extends Provider
                 $roleName = isset($profileData['role-name']) ? trim($profileData['role-name']) : '';
                 $accountId = isset($profileData['account-id']) ? trim($profileData['account-id']) : '';
                 $region = isset($profileData['region']) ? trim($profileData['region']) : '';
-                if (empty($region)) {
-                    $region = 'cn-beijing';
-                }
 
                 if (empty($ak) || empty($sk) || empty($roleName) || empty($accountId)) {
                     throw new ApiException(
@@ -122,12 +119,18 @@ class CLIConfigCredentialProvider extends Provider
                     );
                 }
 
-                $this->delegate = new StsProvider($ak, $sk, $roleName, $accountId, $region);
+                if ($region !== '') {
+                    $this->delegate = new StsProvider($ak, $sk, $roleName, $accountId, $region);
+                } else {
+                    $this->delegate = new StsProvider($ak, $sk, $roleName, $accountId);
+                }
                 return null;
 
             case 'oidc':
                 $oidcTokenFile = isset($profileData['oidc-token-file']) ? trim($profileData['oidc-token-file']) : '';
                 $roleTrn = isset($profileData['role-trn']) ? trim($profileData['role-trn']) : '';
+                $policy = isset($profileData['policy']) ? trim($profileData['policy']) : null;
+                $region = isset($profileData['region']) ? trim($profileData['region']) : '';
 
                 if (empty($oidcTokenFile) || empty($roleTrn)) {
                     throw new ApiException(
@@ -135,7 +138,16 @@ class CLIConfigCredentialProvider extends Provider
                     );
                 }
 
-                $this->delegate = new OidcCredentialProvider($roleTrn, $oidcTokenFile);
+                $this->delegate = new OidcCredentialProvider(
+                    $roleTrn,
+                    $oidcTokenFile,
+                    null,
+                    $policy ?: null,
+                    null,
+                    OidcCredentialProvider::DEFAULT_DURATION_SECONDS,
+                    OidcCredentialProvider::DEFAULT_EXPIRE_BUFFER_SECONDS,
+                    $region !== '' ? $region : OidcCredentialProvider::DEFAULT_REGION
+                );
                 return null;
 
             case 'ecsrole':

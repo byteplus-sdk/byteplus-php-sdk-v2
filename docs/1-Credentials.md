@@ -108,7 +108,7 @@ try {
 
 ### AssumeRole
 
-AssumeRole provides dynamic credentials. `StsProvider::getCredentials()` calls STS `AssumeRole` on every invocation and returns `Result.Credentials`; it does not maintain a local cache or refresh window. This provider handles HTTP status and STS `ResponseMetadata.Error`, but it does not perform additional client-side validation for the completeness of the `Credentials` fields in the JSON response.
+AssumeRole provides dynamic credentials. `StsProvider::getCredentials()` caches the returned credentials and refreshes them 60 seconds before `ExpiredTime`. It validates the required STS fields and retries transient failures. The default endpoint and signing region are `sts.ap-southeast-1.byteplusapi.com` and `ap-southeast-1`.
 
 > ⚠️ **Notes**
 >
@@ -125,10 +125,10 @@ $sts = new \Byteplus\Common\Auth\Providers\StsProvider(
     "Your sk", // required
     "Your role name",  // required
     "Your account id", // required
-    "cn-beijing", // optional
+    "ap-southeast-1", // optional; default ap-southeast-1
     "3600", // optional
     "https", // optional
-    "sts.byteplusapi.com", // optional
+    "sts.ap-southeast-1.byteplusapi.com", // optional; default shown
     '{"Statement":[{"Effect":"Allow","Action":["vpc:CreateVpc"],"Resource":["*"],"Condition":{"StringEquals":{"byteplus:RequestedRegion":["cn-beijing"]}}}]}' // optional
 );
 
@@ -144,7 +144,7 @@ try {
 
 ### OIDC Credential Provider
 
-`OidcCredentialProvider` obtains temporary credentials via STS AssumeRoleWithOIDC, caches them and refreshes before expiry. The expiry prefers the `Expiration` returned by STS; if the response does not include that field, it falls back to the local `durationSeconds` estimate. We recommend setting `durationSeconds` slightly shorter than your actual STS TTL to absorb network latency and clock skew.
+`OidcCredentialProvider` obtains temporary credentials via STS AssumeRoleWithOIDC, caches them and refreshes 60 seconds before expiry. The expiry prefers the `Expiration` returned by STS and falls back to `ExpiredTime`; responses without a valid server-side expiry are rejected.
 
 Supported OIDC env vars:
 
@@ -165,12 +165,12 @@ $provider = new \Byteplus\Common\Auth\Providers\OidcCredentialProvider(
     "/var/run/secrets/oidc/token",           // oidcTokenFile (required)
     "credentials-php-demo",                  // roleSessionName (optional)
     null,                                    // rolePolicy (optional)
-    "sts.byteplusapi.com"                  // stsEndpoint (optional)
+    "sts.ap-southeast-1.byteplusapi.com" // stsEndpoint (optional; default shown)
 );
 
 // Optional: tune retry and transport settings via fluent setters
 // $provider->setSchema('https')       // 'http' or 'https', default 'https'
-//          ->setMaxRetries(3)          // extra retry attempts; 0 = no retry, default 3
+//          ->setMaxRetries(3)          // total attempts including the first, minimum 1
 //          ->setRetryInterval(1);      // seconds between retries, default 1
 
 $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
@@ -196,7 +196,7 @@ $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
 
 ### SAML Credential Provider
 
-`SamlCredentialProvider` exchanges a SAML 2.0 assertion (returned by your IdP) for temporary STS credentials via `AssumeRoleWithSAML`. Credentials are cached and auto-refreshed before expiry. The expiry is estimated from the local `durationSeconds`; we recommend setting `durationSeconds` slightly shorter than your STS TTL to absorb network latency and clock skew.
+`SamlCredentialProvider` exchanges a SAML 2.0 assertion (returned by your IdP) for temporary STS credentials via `AssumeRoleWithSAML`. The request includes a generated `RoleSessionName`; credentials are cached and refreshed 60 seconds before the server-provided `Expiration` or `ExpiredTime`.
 
 > ⚠️ **Notes**
 >
@@ -214,12 +214,12 @@ $provider = new \Byteplus\Common\Auth\Providers\SamlCredentialProvider(
     "MyIdp",                                   // SAML provider name (required)
     "BASE64_ENCODED_SAML_RESPONSE_FROM_IDP",   // SAML assertion (required)
     null,                                      // role policy (optional)
-    "sts.byteplusapi.com"                    // sts endpoint (optional)
+    "sts.ap-southeast-1.byteplusapi.com"   // sts endpoint (optional; default shown)
 );
 
 // Optional: tune retry and transport settings via fluent setters
 // $provider->setSchema('https')       // 'http' or 'https', default 'https'
-//          ->setMaxRetries(3)          // extra retry attempts; 0 = no retry, default 3
+//          ->setMaxRetries(3)          // total attempts including the first, minimum 1
 //          ->setRetryInterval(1);      // seconds between retries, default 1
 
 $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
@@ -283,38 +283,23 @@ $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
 
 #### Runtime Refresh Behavior (sso / console-login)
 
-For `sso` and `console-login` modes the SDK auto-refreshes credentials in the
-current PHP process when the cached access token enters its expiry window (60 s
-before its TTL). Because PHP processes are short-lived, the refresh contract
-differs slightly from the Go / Java / Python SDKs:
+For `sso` and `console-login` modes the SDK refreshes expired access tokens and
+keeps the refreshed state in the current PHP process, matching the Python SDK:
 
 - **Per-object in-memory cache**: a single `CLIConfigCredentialProvider` instance
   caches the parsed credentials for the lifetime of the object (within a single
   PHP request), so repeated API calls inside one request reuse the same STS.
-- **Disk-backed cross-process refresh**: the SDK *does* write the refreshed
-  token back to the cache file (`~/.byteplus/sso/cache/<sha1>.json` or
-  `~/.byteplus/login/cache/<sha1(login_session)>.json`) via atomic rename,
-  so concurrent PHP processes — and byteplus-cli itself — can share the
-  refreshed `refresh_token`. This is the opposite of the long-running Go /
-  Java / Python SDKs (which keep refresh state purely in memory) and is the
-  correct trade-off for PHP's short request lifecycle.
-- **`refresh_token` rotation**: when the server returns HTTP 400
-  `invalid_grant`, the SDK reloads the cache file once, compares the disk
-  `refresh_token` against the in-memory copy, and retries the refresh
-  exactly once with the disk state. This recovers the case where a
-  concurrent `bp login` (or another PHP process) rotated the token under us
-  without colliding writes. If the disk also yields no fresher token, the
-  SDK raises an `ApiException` containing `please run 'bp login'` /
-  `'bp sso login'` so the user knows the remedy.
+- **CLI-owned disk cache**: the SDK never writes the SSO or console-login cache;
+  `bp login` / `bp sso login` remain the sole disk-cache writers.
+- **Console-login rotation recovery**: on HTTP 400 `invalid_grant`, the
+  console-login provider reloads the disk cache once and retries only when it
+  finds a different refresh token. SSO surfaces the refresh failure directly,
+  matching Python behavior.
 - **Actionable error messages**: every error path that requires
   re-authentication contains `'bp login'` (console-login) or `'bp sso login'`
   (sso) so the caller can present a clear next step.
 
 ### ECS Role Credential Provider
-
-> 🚨 **Current version limitation**
->
-> **Auto-detection of the role name from IMDS is not yet supported in the current release.** You must pass the role name explicitly via the constructor argument or the `BYTEPLUS_ECS_METADATA` environment variable. Auto-detection will be supported in a future version — please watch the release notes.
 
 `EcsRoleCredentialProvider` reads temporary credentials from ECS IMDS.
 
@@ -328,7 +313,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 $provider = \Byteplus\Common\Auth\Providers\EcsRoleCredentialProvider::create("your-ecs-role-name");
 
 // Optional: tune retry and timeout settings via fluent setters
-// $provider->setMaxRetries(3)            // extra retry attempts; 0 = no retry, default 3
+// $provider->setMaxRetries(3)            // total attempts including the first, minimum 1
 //          ->setRetryInterval(1)          // seconds between retries, default 1
 //          ->setConnectTimeout(1)         // seconds, default 1
 //          ->setReadTimeout(1)            // seconds, default 1

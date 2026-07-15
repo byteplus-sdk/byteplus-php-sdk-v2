@@ -12,6 +12,7 @@ class SamlCredentialProvider extends Provider
     const DEFAULT_DURATION_SECONDS = 3600;
     const DEFAULT_EXPIRE_BUFFER_SECONDS = 60;
     const MAX_EXPIRE_BUFFER_SECONDS = 600;
+    const DEFAULT_REGION = 'ap-southeast-1';
 
     private $roleName;
     private $accountId;
@@ -21,24 +22,45 @@ class SamlCredentialProvider extends Provider
     private $stsEndpoint;
     private $durationSeconds;
     private $expireBufferSeconds;
+    private $roleTrn;
+    private $samlProviderTrn;
+    private $roleSessionName;
+    private $region;
 
     private $cachedCredentials;
     private $expirationTime = 0;
 
     public function __construct(
-        $roleName,
-        $accountId,
-        $samlProviderName,
-        $samlAssertion,
+        $roleName = null,
+        $accountId = null,
+        $samlProviderName = null,
+        $samlAssertion = null,
         $rolePolicy = null,
         $stsEndpoint = null,
         $durationSeconds = self::DEFAULT_DURATION_SECONDS,
-        $expireBufferSeconds = self::DEFAULT_EXPIRE_BUFFER_SECONDS
+        $expireBufferSeconds = self::DEFAULT_EXPIRE_BUFFER_SECONDS,
+        $roleTrn = null,
+        $samlProviderTrn = null,
+        $roleSessionName = null,
+        $region = self::DEFAULT_REGION
     )
     {
-        if (empty($roleName) || empty($accountId) || empty($samlProviderName) || empty($samlAssertion)) {
+        $resolvedRoleTrn = !empty($roleTrn)
+            ? $roleTrn
+            : (!empty($roleName) && !empty($accountId)
+                ? 'trn:iam::' . $accountId . ':role/' . $roleName
+                : null);
+        $resolvedAccountId = !empty($accountId) ? $accountId : $this->extractAccountId($resolvedRoleTrn);
+        $resolvedSamlProviderTrn = !empty($samlProviderTrn)
+            ? $samlProviderTrn
+            : (!empty($samlProviderName) && !empty($resolvedAccountId)
+                ? 'trn:iam::' . $resolvedAccountId . ':saml-provider/' . $samlProviderName
+                : null);
+
+        if (empty($resolvedRoleTrn) || empty($resolvedSamlProviderTrn) || empty($samlAssertion)) {
             throw new \InvalidArgumentException(
-                self::PROVIDER_NAME . ': roleName, accountId, samlProviderName and samlAssertion are required'
+                self::PROVIDER_NAME . ': roleTrn, samlProviderTrn and samlAssertion are required; '
+                . 'TRNs may be supplied directly or derived from roleName, accountId and samlProviderName'
             );
         }
         if ($expireBufferSeconds > self::MAX_EXPIRE_BUFFER_SECONDS) {
@@ -55,6 +77,10 @@ class SamlCredentialProvider extends Provider
         $this->stsEndpoint = $stsEndpoint ?: StsFormRequest::DEFAULT_STS_ENDPOINT;
         $this->durationSeconds = $durationSeconds;
         $this->expireBufferSeconds = $expireBufferSeconds;
+        $this->roleTrn = $resolvedRoleTrn;
+        $this->samlProviderTrn = $resolvedSamlProviderTrn;
+        $this->roleSessionName = $roleSessionName;
+        $this->region = $region;
     }
 
     public function getCredentials()
@@ -76,13 +102,14 @@ class SamlCredentialProvider extends Provider
 
         $bodyParams = [
             'DurationSeconds' => $this->durationSeconds,
-            'RoleTrn' => 'trn:iam::' . $this->accountId . ':role/' . $this->roleName,
-            'SAMLProviderTrn' => 'trn:iam::' . $this->accountId . ':saml-provider/' . $this->samlProviderName,
+            'RoleSessionName' => $this->roleSessionName ?: md5(uniqid('', true)),
+            'RoleTrn' => $this->roleTrn,
+            'SAMLProviderTrn' => $this->samlProviderTrn,
             'SAMLResp' => $this->samlAssertion,
         ];
 
         // SAML puts Policy in form body
-        if (!empty($this->rolePolicy)) {
+        if ($this->rolePolicy !== null) {
             $bodyParams['Policy'] = $this->rolePolicy;
         }
 
@@ -137,13 +164,28 @@ class SamlCredentialProvider extends Provider
             'SessionToken' => $creds['SessionToken'],
             'ProviderName' => self::PROVIDER_NAME,
         ];
-        $expiration = time() + $this->durationSeconds;
-        if (isset($creds['Expiration'])) {
-            $ts = strtotime($creds['Expiration']);
-            if ($ts !== false) {
-                $expiration = $ts;
-            }
+        $expirationValue = array_key_exists('Expiration', $creds)
+            ? $creds['Expiration']
+            : (isset($creds['ExpiredTime']) ? $creds['ExpiredTime'] : null);
+        $expiration = is_string($expirationValue) ? strtotime($expirationValue) : false;
+        if ($expiration === false) {
+            throw new ApiException(
+                self::PROVIDER_NAME . ': AssumeRoleWithSAML credentials missing or invalid expiration',
+                0, [], $responseBody
+            );
         }
         $this->expirationTime = $expiration - $this->expireBufferSeconds;
+    }
+
+    private function extractAccountId($roleTrn)
+    {
+        if (empty($roleTrn)) {
+            return null;
+        }
+        $parts = explode(':', $roleTrn);
+        if (count($parts) >= 4 && $parts[0] === 'trn' && $parts[1] === 'iam' && $parts[3] !== '') {
+            return $parts[3];
+        }
+        return null;
     }
 }

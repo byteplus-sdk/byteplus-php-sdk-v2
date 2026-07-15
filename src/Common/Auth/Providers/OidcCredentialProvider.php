@@ -10,7 +10,9 @@ class OidcCredentialProvider extends Provider
 
     const PROVIDER_NAME = 'OidcCredentialProvider';
     const DEFAULT_DURATION_SECONDS = 3600;
-    const DEFAULT_EXPIRE_BUFFER_SECONDS = 300;
+    const DEFAULT_EXPIRE_BUFFER_SECONDS = 60;
+    const MAX_EXPIRE_BUFFER_SECONDS = 600;
+    const DEFAULT_REGION = 'ap-southeast-1';
 
     private $roleTrn;
     private $roleSessionName;
@@ -19,6 +21,7 @@ class OidcCredentialProvider extends Provider
     private $stsEndpoint;
     private $durationSeconds;
     private $expireBufferSeconds;
+    private $region;
 
     private $cachedCredentials;
     private $expirationTime = 0;
@@ -30,18 +33,24 @@ class OidcCredentialProvider extends Provider
         $rolePolicy = null,
         $stsEndpoint = null,
         $durationSeconds = self::DEFAULT_DURATION_SECONDS,
-        $expireBufferSeconds = self::DEFAULT_EXPIRE_BUFFER_SECONDS
+        $expireBufferSeconds = self::DEFAULT_EXPIRE_BUFFER_SECONDS,
+        $region = self::DEFAULT_REGION
     )
     {
+        if ($expireBufferSeconds > self::MAX_EXPIRE_BUFFER_SECONDS) {
+            throw new \InvalidArgumentException(
+                self::PROVIDER_NAME . ': expireBufferSeconds must be less than or equal to '
+                . self::MAX_EXPIRE_BUFFER_SECONDS
+            );
+        }
         $this->roleTrn = $roleTrn;
-        $this->roleSessionName = !empty($roleSessionName)
-            ? $roleSessionName
-            : 'credentials-php-' . ((int)(microtime(true) * 1000000));
+        $this->roleSessionName = !empty($roleSessionName) ? $roleSessionName : null;
         $this->oidcTokenFile = $oidcTokenFile;
         $this->rolePolicy = $rolePolicy;
         $this->stsEndpoint = $stsEndpoint ?: StsFormRequest::DEFAULT_STS_ENDPOINT;
         $this->durationSeconds = $durationSeconds;
         $this->expireBufferSeconds = $expireBufferSeconds;
+        $this->region = $region;
     }
 
     public static function fromEnvironment()
@@ -90,7 +99,7 @@ class OidcCredentialProvider extends Provider
 
         $bodyParams = [
             'DurationSeconds' => $this->durationSeconds,
-            'RoleSessionName' => $this->roleSessionName,
+            'RoleSessionName' => $this->roleSessionName ?: $this->newRoleSessionName(),
             'RoleTrn' => $this->roleTrn,
             'OIDCToken' => $oidcToken,
         ];
@@ -151,14 +160,21 @@ class OidcCredentialProvider extends Provider
             'SessionToken' => $creds['SessionToken'],
             'ProviderName' => self::PROVIDER_NAME,
         ];
-        // Prefer server-side Expiration; fallback to local duration estimate
-        $expiration = time() + $this->durationSeconds;
-        if (isset($creds['Expiration'])) {
-            $ts = strtotime($creds['Expiration']);
-            if ($ts !== false) {
-                $expiration = $ts;
-            }
+        $expirationValue = array_key_exists('Expiration', $creds)
+            ? $creds['Expiration']
+            : (isset($creds['ExpiredTime']) ? $creds['ExpiredTime'] : null);
+        $expiration = is_string($expirationValue) ? strtotime($expirationValue) : false;
+        if ($expiration === false) {
+            throw new ApiException(
+                self::PROVIDER_NAME . ': AssumeRoleWithOIDC credentials missing or invalid expiration',
+                0, [], $responseBody
+            );
         }
         $this->expirationTime = $expiration - $this->expireBufferSeconds;
+    }
+
+    private function newRoleSessionName()
+    {
+        return 'credentials-php-' . ((int) (microtime(true) * 1000000));
     }
 }

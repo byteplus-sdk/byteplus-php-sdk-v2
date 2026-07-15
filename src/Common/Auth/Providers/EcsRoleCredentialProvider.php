@@ -39,7 +39,7 @@ class EcsRoleCredentialProvider extends Provider
     private $expireBufferSeconds;
 
     private $cachedCredentials;
-    private $expirationTime = 0;
+    private $expirationTime;
 
     public function __construct(
         $roleName = null,
@@ -50,14 +50,17 @@ class EcsRoleCredentialProvider extends Provider
         $expireBufferSeconds = self::DEFAULT_EXPIRE_BUFFER_SECONDS
     )
     {
+        if (strtolower((string) getenv('BYTEPLUS_ECS_METADATA_DISABLED')) === 'true') {
+            throw new \InvalidArgumentException(
+                self::PROVIDER_NAME . ': IMDS credentials are disabled via '
+                . 'BYTEPLUS_ECS_METADATA_DISABLED=true'
+            );
+        }
         if ($connectTimeout < 0) {
             throw new \InvalidArgumentException('connectTimeout must be >= 0');
         }
         if ($readTimeout < 0) {
             throw new \InvalidArgumentException('readTimeout must be >= 0');
-        }
-        if ($maxRetries < 0) {
-            throw new \InvalidArgumentException('maxRetries must be >= 0');
         }
         if ($retryInterval < 0) {
             throw new \InvalidArgumentException('retryInterval must be >= 0');
@@ -68,21 +71,19 @@ class EcsRoleCredentialProvider extends Provider
         $this->roleName = $roleName;
         $this->connectTimeout = $connectTimeout;
         $this->readTimeout = $readTimeout;
-        $this->maxRetries = $maxRetries;
+        $this->maxRetries = max((int) $maxRetries, 1);
         $this->retryInterval = $retryInterval;
         $this->expireBufferSeconds = $expireBufferSeconds;
+        $this->expirationTime = null;
     }
 
     /**
-     * @param int $maxRetries extra retry attempts; 0 = no retry
+     * @param int $maxRetries total attempts, including the first
      * @return $this
      */
     public function setMaxRetries($maxRetries)
     {
-        if ($maxRetries < 0) {
-            throw new \InvalidArgumentException('maxRetries must be >= 0');
-        }
-        $this->maxRetries = $maxRetries;
+        $this->maxRetries = max((int) $maxRetries, 1);
         return $this;
     }
 
@@ -140,18 +141,12 @@ class EcsRoleCredentialProvider extends Provider
 
     public static function create($roleName = null)
     {
-        $disabled = getenv('BYTEPLUS_ECS_METADATA_DISABLED');
-        if (strtolower($disabled) === 'true') {
-            throw new ApiException(
-                self::PROVIDER_NAME . ': IMDS is disabled via BYTEPLUS_ECS_METADATA_DISABLED=true'
-            );
-        }
-
         $resolvedRoleName = $roleName;
         if (empty($resolvedRoleName)) {
             $envRole = getenv('BYTEPLUS_ECS_METADATA');
-            if ($envRole !== false && $envRole !== '') {
-                $resolvedRoleName = $envRole;
+            $trimmedEnvRole = $envRole !== false ? trim($envRole) : '';
+            if ($trimmedEnvRole !== '') {
+                $resolvedRoleName = $trimmedEnvRole;
             }
         }
 
@@ -161,7 +156,9 @@ class EcsRoleCredentialProvider extends Provider
 
     public function getCredentials()
     {
-        if ($this->cachedCredentials !== null && time() < $this->expirationTime) {
+        if ($this->cachedCredentials !== null
+            && ($this->expirationTime === null
+                || time() < $this->expirationTime - $this->expireBufferSeconds)) {
             return $this->cachedCredentials;
         }
 
@@ -199,12 +196,15 @@ class EcsRoleCredentialProvider extends Provider
             );
         }
 
-        $expiration = time() + 3600; // default 1h
+        $expiration = null;
         if (!empty($expirationStr)) {
             $ts = strtotime($expirationStr);
-            if ($ts !== false) {
-                $expiration = $ts;
+            if ($ts === false) {
+                throw new ApiException(
+                    self::PROVIDER_NAME . ': IMDS response contains invalid ExpiredTime'
+                );
             }
+            $expiration = $ts;
         }
 
         $this->cachedCredentials = [
@@ -213,7 +213,7 @@ class EcsRoleCredentialProvider extends Provider
             'SessionToken' => $token,
             'ProviderName' => self::PROVIDER_NAME,
         ];
-        $this->expirationTime = $expiration - $this->expireBufferSeconds;
+        $this->expirationTime = $expiration;
     }
 
     // --- IMDSv2 token ---
@@ -243,8 +243,9 @@ class EcsRoleCredentialProvider extends Provider
         }
 
         $envRole = getenv('BYTEPLUS_ECS_METADATA');
-        if ($envRole !== false && $envRole !== '') {
-            return $envRole;
+        $trimmedEnvRole = $envRole !== false ? trim($envRole) : '';
+        if ($trimmedEnvRole !== '') {
+            return $trimmedEnvRole;
         }
 
         // Auto-detect from IMDS (not cached — roles can change dynamically)
@@ -259,7 +260,16 @@ class EcsRoleCredentialProvider extends Provider
         ]);
 
         $roles = json_decode($body, true);
-        if (!is_array($roles)) {
+        if (json_last_error() === JSON_ERROR_NONE) {
+            if (!is_array($roles) || !$this->isList($roles)) {
+                throw new ApiException(
+                    self::PROVIDER_NAME . ': unexpected role list response format'
+                );
+            }
+            $roles = array_map(function ($role) {
+                return is_string($role) ? trim($role) : (string) $role;
+            }, array_filter($roles));
+        } else {
             // Fallback: split by newlines
             $roles = array_filter(array_map('trim', explode("\n", trim($body))));
         }
@@ -282,6 +292,21 @@ class EcsRoleCredentialProvider extends Provider
         return $roles[0];
     }
 
+    private function isList($value)
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+        $expectedKey = 0;
+        foreach ($value as $key => $unused) {
+            if ($key !== $expectedKey) {
+                return false;
+            }
+            $expectedKey++;
+        }
+        return true;
+    }
+
     // --- HTTP helpers ---
 
     private function doRequestWithRetry($url, $method = 'GET', $headers = [])
@@ -289,12 +314,16 @@ class EcsRoleCredentialProvider extends Provider
         $lastError = null;
         $timeout = $this->connectTimeout + $this->readTimeout;
 
-        for ($attempt = 0; $attempt <= $this->maxRetries; $attempt++) {
+        for ($attempt = 0; $attempt < $this->maxRetries; $attempt++) {
             try {
                 return $this->doRequest($url, $method, $headers, $timeout);
             } catch (ApiException $e) {
+                $statusCode = $e->getCode();
+                if ($statusCode > 0 && $statusCode < 500) {
+                    throw $e;
+                }
                 $lastError = $e;
-                if ($attempt < $this->maxRetries) {
+                if ($attempt < $this->maxRetries - 1) {
                     sleep($this->retryInterval);
                 }
             }
@@ -327,9 +356,20 @@ class EcsRoleCredentialProvider extends Provider
             );
         }
 
+        // PHP 8.5 deprecates direct access to the predefined local
+        // $http_response_header variable; keep a PHP 5.5-compatible fallback.
+        if (function_exists('http_get_last_response_headers')) {
+            $responseHeaders = http_get_last_response_headers();
+        } else {
+            $scopeVariables = get_defined_vars();
+            $responseHeaders = isset($scopeVariables['http_response_header'])
+                ? $scopeVariables['http_response_header']
+                : null;
+        }
+
         // Check HTTP status
-        if (isset($http_response_header) && is_array($http_response_header)) {
-            $statusLine = $http_response_header[0];
+        if (is_array($responseHeaders) && isset($responseHeaders[0])) {
+            $statusLine = $responseHeaders[0];
             if (preg_match('/HTTP\/\S+\s+(\d+)/', $statusLine, $matches)) {
                 $statusCode = (int)$matches[1];
                 if ($statusCode !== 200) {

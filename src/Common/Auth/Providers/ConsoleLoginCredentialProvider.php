@@ -12,12 +12,11 @@ use Byteplus\Common\ApiException;
  * Internal delegate for CLI config profile mode `console-login`.
  *
  * Contract (matches the cross-SDK plan, adapted to PHP's process model):
- *   - PHP processes are short-lived; tokens must survive across requests via the
- *     disk cache file. SDK and `bp login` are co-writers of that file. Both use
- *     atomic rename writes to avoid torn reads.
+ *   - The SDK reads the disk cache only to bootstrap in-memory state and when
+ *     handling an invalid_grant race. byteplus-cli remains the sole cache writer.
  *   - On expiry, the SDK silently refreshes by POSTing
  *     {endpoint_url}/authorize/oauth/token with grant_type=refresh_token, then
- *     writes the refreshed cache back via atomic rename.
+ *     keeps the refreshed token in memory for the lifetime of this provider.
  *   - If the signin service rejects the in-memory refresh_token with HTTP 400
  *     invalid_grant, the SDK reloads the cache file once. If a concurrent
  *     `bp login` (or another SDK process) refreshed the file under us, retry
@@ -40,12 +39,14 @@ class ConsoleLoginCredentialProvider extends Provider
     private $cacheDir;
     private $cachedCredentials;
     private $expirationTime = 0;
+    private $tokenCache;
 
     public function __construct($profileData, $profileName, $cacheDir)
     {
         $this->profileData = $profileData;
         $this->profileName = $profileName;
         $this->cacheDir = $cacheDir;
+        $this->tokenCache = null;
     }
 
     public function getCredentials()
@@ -68,17 +69,19 @@ class ConsoleLoginCredentialProvider extends Provider
         }
 
         $tokenPath = $this->resolveTokenCachePath($loginSession);
-        $tokenCache = $this->loadTokenCache($tokenPath);
+        if ($this->tokenCache === null) {
+            $this->tokenCache = $this->loadTokenCache($tokenPath);
+        }
 
         // Fast path: cached access_token still within TTL.
-        $applied = $this->tryApplyCache($tokenCache, $tokenPath);
+        $applied = $this->tryApplyCache($this->tokenCache, $tokenPath);
         if ($applied !== null) {
             return $applied;
         }
 
         // Slow path: refresh via OAuth.
         try {
-            $refreshed = $this->refreshAccessToken($tokenCache, $tokenPath);
+            $refreshed = $this->refreshAccessToken($this->tokenCache, $tokenPath);
         } catch (InvalidGrantApiException $e) {
             // Fallback: another process (typically `bp login` or a sibling
             // SDK request) may have rotated the cache under us. Reload disk
@@ -87,20 +90,21 @@ class ConsoleLoginCredentialProvider extends Provider
             $diskCache = $this->loadTokenCache($tokenPath);
             $diskRT = isset($diskCache['refresh_token']) && is_string($diskCache['refresh_token'])
                 ? trim($diskCache['refresh_token']) : '';
-            $memRT = isset($tokenCache['refresh_token']) && is_string($tokenCache['refresh_token'])
-                ? trim($tokenCache['refresh_token']) : '';
+            $memRT = isset($this->tokenCache['refresh_token']) && is_string($this->tokenCache['refresh_token'])
+                ? trim($this->tokenCache['refresh_token']) : '';
             if ($diskRT === '' || $diskRT === $memRT) {
                 throw new ApiException(
                     self::PROVIDER_NAME . ": console-login refresh token was rejected and the disk cache holds no fresher token; please run 'bp login' to re-authenticate. underlying error: "
                         . $e->getMessage()
                 );
             }
-            $applied = $this->tryApplyCache($diskCache, $tokenPath);
+            $this->tokenCache = $diskCache;
+            $applied = $this->tryApplyCache($this->tokenCache, $tokenPath);
             if ($applied !== null) {
                 return $applied;
             }
             try {
-                $refreshed = $this->refreshAccessToken($diskCache, $tokenPath);
+                $refreshed = $this->refreshAccessToken($this->tokenCache, $tokenPath);
             } catch (InvalidGrantApiException $e2) {
                 throw new ApiException(
                     self::PROVIDER_NAME . ": console-login refresh token rejected; reloaded disk cache but the new refresh token was also rejected; please run 'bp login' to re-authenticate. underlying error: "
@@ -119,11 +123,19 @@ class ConsoleLoginCredentialProvider extends Provider
      */
     private function tryApplyCache($tokenCache, $tokenPath)
     {
-        $expiration = $this->consoleLoginExpiration($tokenCache, $tokenPath);
+        try {
+            $expiration = $this->consoleLoginExpiration($tokenCache, $tokenPath);
+        } catch (\Exception $e) {
+            return null;
+        }
         if (time() >= $expiration - self::EXPIRE_BUFFER_SECONDS) {
             return null;
         }
-        $stsCreds = $this->parseAccessToken($tokenCache, $tokenPath);
+        try {
+            $stsCreds = $this->parseAccessToken($tokenCache, $tokenPath);
+        } catch (\Exception $e) {
+            return null;
+        }
         $this->expirationTime = $expiration - self::EXPIRE_BUFFER_SECONDS;
         return [
             'AccessKeyId' => $stsCreds['access_key_id'],
@@ -135,8 +147,8 @@ class ConsoleLoginCredentialProvider extends Provider
 
     /**
      * refreshAccessToken POSTs the refresh_token grant to the signin OAuth
-     * endpoint, persists the refreshed cache (atomic rename) so other PHP
-     * processes can reuse it, and returns the new credential array.
+     * endpoint, updates the provider's in-memory cache, and returns the new
+     * credential array. The disk cache remains owned by byteplus-cli.
      *
      * Throws {@see InvalidGrantApiException} on HTTP 400 invalid_grant so the
      * caller can run the disk-reload fallback. All other failures throw
@@ -247,9 +259,6 @@ class ConsoleLoginCredentialProvider extends Provider
         $tokenCache['issued_at'] = gmdate('Y-m-d\TH:i:s\Z');
         $tokenCache['expires_in'] = $newExpiresIn;
 
-        // Persist atomically so other PHP processes can reuse this refresh.
-        $this->saveTokenCache($tokenPath, $tokenCache);
-
         $applied = $this->tryApplyCache($tokenCache, $tokenPath);
         if ($applied === null) {
             throw new ApiException(
@@ -268,7 +277,7 @@ class ConsoleLoginCredentialProvider extends Provider
         }
 
         $tokenPath = $this->cacheDir . DIRECTORY_SEPARATOR . sha1($loginSession) . '.json';
-        if (!file_exists($tokenPath)) {
+        if ($this->tokenCache === null && !file_exists($tokenPath)) {
             throw new ApiException(
                 self::PROVIDER_NAME . ": console-login token cache file {$tokenPath} does not exist; please run 'bp login' to re-authenticate"
             );
@@ -372,32 +381,4 @@ class ConsoleLoginCredentialProvider extends Provider
         ];
     }
 
-    /**
-     * saveTokenCache writes the refreshed cache atomically (tmp file + rename)
-     * so concurrent readers always see a valid file. Failures are non-fatal
-     * (in-memory credentials are already valid); the next process will fall
-     * back to refreshing again.
-     */
-    private function saveTokenCache($tokenPath, $tokenCache)
-    {
-        $dir = dirname($tokenPath);
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0700, true);
-        }
-        $json = json_encode($tokenCache, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        if ($json === false) {
-            // Sharpen the no-corrupt-write guarantee: never call file_put_contents
-            // with a false payload. Refresh is still applied in-memory; the next
-            // process will fall back to refreshing again.
-            return;
-        }
-        $tmpFile = $tokenPath . '.tmp.' . getmypid();
-        if (@file_put_contents($tmpFile, $json) === false) {
-            return;
-        }
-        @chmod($tmpFile, 0600);
-        if (!@rename($tmpFile, $tokenPath)) {
-            @unlink($tmpFile);
-        }
-    }
 }
