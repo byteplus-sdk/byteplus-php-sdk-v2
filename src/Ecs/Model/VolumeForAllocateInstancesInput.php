@@ -28,6 +28,7 @@ class VolumeForAllocateInstancesInput implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
+        'delete_with_instance' => 'string',
         'extra_performance_iops' => 'int',
         'extra_performance_throughput_mb' => 'int',
         'extra_performance_type_id' => 'string',
@@ -42,6 +43,7 @@ class VolumeForAllocateInstancesInput implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
+        'delete_with_instance' => null,
         'extra_performance_iops' => 'int32',
         'extra_performance_throughput_mb' => 'int32',
         'extra_performance_type_id' => null,
@@ -77,6 +79,7 @@ class VolumeForAllocateInstancesInput implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
+        'delete_with_instance' => 'DeleteWithInstance',
         'extra_performance_iops' => 'ExtraPerformanceIOPS',
         'extra_performance_throughput_mb' => 'ExtraPerformanceThroughputMB',
         'extra_performance_type_id' => 'ExtraPerformanceTypeId',
@@ -91,6 +94,7 @@ class VolumeForAllocateInstancesInput implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $setters = [
+        'delete_with_instance' => 'setDeleteWithInstance',
         'extra_performance_iops' => 'setExtraPerformanceIops',
         'extra_performance_throughput_mb' => 'setExtraPerformanceThroughputMb',
         'extra_performance_type_id' => 'setExtraPerformanceTypeId',
@@ -105,6 +109,7 @@ class VolumeForAllocateInstancesInput implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $getters = [
+        'delete_with_instance' => 'getDeleteWithInstance',
         'extra_performance_iops' => 'getExtraPerformanceIops',
         'extra_performance_throughput_mb' => 'getExtraPerformanceThroughputMb',
         'extra_performance_type_id' => 'getExtraPerformanceTypeId',
@@ -173,6 +178,7 @@ class VolumeForAllocateInstancesInput implements ModelInterface, ArrayAccess
      */
     public function __construct($data = null)
     {
+        $this->container['delete_with_instance'] = isset($data['delete_with_instance']) ? $data['delete_with_instance'] : null;
         $this->container['extra_performance_iops'] = isset($data['extra_performance_iops']) ? $data['extra_performance_iops'] : null;
         $this->container['extra_performance_throughput_mb'] = isset($data['extra_performance_throughput_mb']) ? $data['extra_performance_throughput_mb'] : null;
         $this->container['extra_performance_type_id'] = isset($data['extra_performance_type_id']) ? $data['extra_performance_type_id'] : null;
@@ -207,6 +213,30 @@ class VolumeForAllocateInstancesInput implements ModelInterface, ArrayAccess
         return count($this->listInvalidProperties()) === 0;
     }
 
+
+    /**
+     * Gets delete_with_instance
+     *
+     * @return string
+     */
+    public function getDeleteWithInstance()
+    {
+        return $this->container['delete_with_instance'];
+    }
+
+    /**
+     * Sets delete_with_instance
+     *
+     * @param string $delete_with_instance delete_with_instance
+     *
+     * @return $this
+     */
+    public function setDeleteWithInstance($delete_with_instance)
+    {
+        $this->container['delete_with_instance'] = $delete_with_instance;
+
+        return $this;
+    }
 
     /**
      * Gets extra_performance_iops

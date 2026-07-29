@@ -81,8 +81,8 @@ class DefaultEndpointProvider extends EndpointProvider
                 []
             ),
             'cloudmonitor' => new ServiceEndpointInfo(
-                'cloudmonitor',
-                false,
+                    'cloudmonitor',
+                    true,
                 '',
                 []
             ),
@@ -93,44 +93,44 @@ class DefaultEndpointProvider extends EndpointProvider
                 []
             ),
             'vepfs' => new ServiceEndpointInfo(
-                'vepfs',
-                false,
+                    'vepfs',
+                    false,
                 '',
                 []
             ),
             'vke' => new ServiceEndpointInfo(
-                'vke',
-                false,
+                    'vke',
+                    false,
                 '',
                 []
             ),
             'kickart' => new ServiceEndpointInfo(
-                'kickart',
-                true,
+                    'kickart',
+                    true,
                 '',
                 []
             ),
             'rds_mssql' => new ServiceEndpointInfo(
-                'rds_mssql',
-                false,
+                    'rds_mssql',
+                    false,
                 '',
                 []
             ),
             'sts' => new ServiceEndpointInfo(
-                'sts',
-                false,
+                    'sts',
+                    false,
                 '',
                 []
             ),
             'redis' => new ServiceEndpointInfo(
-                'redis',
-                false,
+                    'redis',
+                    false,
                 '',
                 []
             ),
             'vmp' => new ServiceEndpointInfo(
-                'vmp',
-                false,
+                    'vmp',
+                    true,
                 '',
                 []
             ),
@@ -147,13 +147,176 @@ class DefaultEndpointProvider extends EndpointProvider
                 []
             ),
             'rds_mysql' => new ServiceEndpointInfo(
-                'rds_mysql',
-                false,
+                    'rds_mysql',
+                    false,
                 '',
                 []
             ),
             'privatelink' => new ServiceEndpointInfo(
                 'privatelink',
+                false,
+                '',
+                []
+            ),
+        
+            'waf' => new ServiceEndpointInfo(
+                'waf',
+                true,
+                '',
+                []
+            ),
+            'vpn' => new ServiceEndpointInfo(
+                'vpn',
+                true,
+                '',
+                []
+            ),
+            'vod' => new ServiceEndpointInfo(
+                'vod',
+                false,
+                '',
+                []
+            ),
+            'vefaas' => new ServiceEndpointInfo(
+                'vefaas',
+                false,
+                '',
+                []
+            ),
+            'vedbm' => new ServiceEndpointInfo(
+                'vedbm',
+                false,
+                '',
+                []
+            ),
+            'transitrouter' => new ServiceEndpointInfo(
+                'transitrouter',
+                false,
+                '',
+                []
+            ),
+            'tag' => new ServiceEndpointInfo(
+                'tag',
+                false,
+                '',
+                []
+            ),
+            'storage_ebs' => new ServiceEndpointInfo(
+                'storage_ebs',
+                false,
+                '',
+                []
+            ),
+            'smc' => new ServiceEndpointInfo(
+                'smc',
+                true,
+                '',
+                []
+            ),
+            'resource_share' => new ServiceEndpointInfo(
+                'resource_share',
+                false,
+                '',
+                []
+            ),
+            'rds_postgresql' => new ServiceEndpointInfo(
+                'rds_postgresql',
+                false,
+                '',
+                []
+            ),
+            'rabbitmq' => new ServiceEndpointInfo(
+                'rabbitmq',
+                false,
+                '',
+                []
+            ),
+            'quota' => new ServiceEndpointInfo(
+                'quota',
+                false,
+                '',
+                []
+            ),
+            'private_zone' => new ServiceEndpointInfo(
+                'private_zone',
+                true,
+                '',
+                []
+            ),
+            'mongodb' => new ServiceEndpointInfo(
+                'mongodb',
+                false,
+                '',
+                []
+            ),
+            'ml_platform' => new ServiceEndpointInfo(
+                'ml_platform',
+                false,
+                '',
+                []
+            ),
+            'kafka' => new ServiceEndpointInfo(
+                'kafka',
+                false,
+                '',
+                []
+            ),
+            'escloud' => new ServiceEndpointInfo(
+                'escloud',
+                false,
+                '',
+                []
+            ),
+            'dms' => new ServiceEndpointInfo(
+                'dms',
+                false,
+                '',
+                []
+            ),
+            'directconnect' => new ServiceEndpointInfo(
+                'directconnect',
+                false,
+                '',
+                []
+            ),
+            'cr' => new ServiceEndpointInfo(
+                'cr',
+                false,
+                '',
+                []
+            ),
+            'cp' => new ServiceEndpointInfo(
+                'cp',
+                true,
+                '',
+                []
+            ),
+            'clb' => new ServiceEndpointInfo(
+                'clb',
+                false,
+                '',
+                []
+            ),
+            'cen' => new ServiceEndpointInfo(
+                'cen',
+                false,
+                '',
+                []
+            ),
+            'auto_scaling' => new ServiceEndpointInfo(
+                'auto_scaling',
+                false,
+                '',
+                []
+            ),
+            'apig' => new ServiceEndpointInfo(
+                'apig',
+                true,
+                '',
+                []
+            ),
+            'alb' => new ServiceEndpointInfo(
+                'alb',
                 false,
                 '',
                 []
