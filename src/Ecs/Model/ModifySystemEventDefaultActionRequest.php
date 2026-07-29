@@ -144,8 +144,23 @@ class ModifySystemEventDefaultActionRequest implements ModelInterface, ArrayAcce
         return self::$swaggerModelName;
     }
 
+    const DEFAULT_ACTION_COLD_MIGRATE = 'ColdMigrate';
+    const DEFAULT_ACTION_REPLACE_DISK = 'ReplaceDisk';
     
 
+    
+    /**
+     * Gets allowable values of the enum
+     *
+     * @return string[]
+     */
+    public function getDefaultActionAllowableValues()
+    {
+        return [
+            self::DEFAULT_ACTION_COLD_MIGRATE,
+            self::DEFAULT_ACTION_REPLACE_DISK,
+        ];
+    }
     
 
     /**
@@ -181,6 +196,14 @@ class ModifySystemEventDefaultActionRequest implements ModelInterface, ArrayAcce
         if ($this->container['default_action'] === null) {
             $invalidProperties[] = "'default_action' can't be null";
         }
+        $allowedValues = $this->getDefaultActionAllowableValues();
+        if (!is_null($this->container['default_action']) && !in_array($this->container['default_action'], $allowedValues, true)) {
+            $invalidProperties[] = sprintf(
+                "invalid value for 'default_action', must be one of '%s'",
+                implode("', '", $allowedValues)
+            );
+        }
+
         if ($this->container['event_id'] === null) {
             $invalidProperties[] = "'event_id' can't be null";
         }
@@ -218,6 +241,15 @@ class ModifySystemEventDefaultActionRequest implements ModelInterface, ArrayAcce
      */
     public function setDefaultAction($default_action)
     {
+        $allowedValues = $this->getDefaultActionAllowableValues();
+        if (!in_array($default_action, $allowedValues, true)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "Invalid value for 'default_action', must be one of '%s'",
+                    implode("', '", $allowedValues)
+                )
+            );
+        }
         $this->container['default_action'] = $default_action;
 
         return $this;
