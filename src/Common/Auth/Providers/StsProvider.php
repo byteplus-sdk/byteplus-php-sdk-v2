@@ -30,6 +30,7 @@ class StsProvider extends Provider
     private $headerSelector;
     private $config;
     private $timeout;
+    private $connectTimeout = 5;
     private $expireBufferSeconds;
     private $maxRetries;
     private $retryInterval;
@@ -128,7 +129,7 @@ class StsProvider extends Provider
 
         $client = new Client([
             'timeout' => $this->timeout,
-            'connect_timeout' => 5,
+            'connect_timeout' => $this->connectTimeout,
             'verify' => true,
             'http_errors' => false,
         ]);
@@ -137,7 +138,7 @@ class StsProvider extends Provider
             try {
                 $response = $client->send($request, [
                     'timeout' => $this->timeout,
-                    'connect_timeout' => 5,
+                    'connect_timeout' => $this->connectTimeout,
                 ]);
                 $statusCode = $response->getStatusCode();
                 if ($statusCode >= 200 && $statusCode <= 299) {
@@ -156,7 +157,7 @@ class StsProvider extends Provider
                     $response->getHeaders(),
                     (string) $response->getBody()
                 );
-                if ($statusCode < 500) {
+                if ($statusCode !== 429 && $statusCode < 500) {
                     throw $lastException;
                 }
             } catch (TransferException $e) {
@@ -229,6 +230,38 @@ class StsProvider extends Provider
             'SessionToken' => $credentials['SessionToken'],
             'ProviderName' => self::PROVIDER_NAME,
         ];
+    }
+
+    public function setConnectTimeout($connectTimeout)
+    {
+        $this->connectTimeout = $connectTimeout;
+        return $this;
+    }
+
+    public function setReadTimeout($readTimeout)
+    {
+        $this->timeout = $readTimeout;
+        return $this;
+    }
+
+    public function setMaxRetries($maxRetries)
+    {
+        if ($maxRetries < 0) {
+            throw new \InvalidArgumentException('maxRetries must be >= 0');
+        }
+        // The constructor keeps its historical total-attempt semantics; this
+        // setter follows the public retry-count semantics used by other SDKs.
+        $this->maxRetries = (int) $maxRetries + 1;
+        return $this;
+    }
+
+    public function setRetryInterval($retryInterval)
+    {
+        if ($retryInterval < 0) {
+            throw new \InvalidArgumentException('retryInterval must be >= 0');
+        }
+        $this->retryInterval = $retryInterval;
+        return $this;
     }
 }
 

@@ -2,6 +2,9 @@
 
 namespace Byteplus\Common\Interceptor\Interceptors;
 
+use Byteplus\Common\LogHelper;
+use Byteplus\Common\SdkLogger;
+
 class ResolveEndpointInterceptor extends Interceptor
 {
     public $endpointProvider;
@@ -9,6 +12,11 @@ class ResolveEndpointInterceptor extends Interceptor
     public function __construct($endpointProvider)
     {
         $this->endpointProvider = $endpointProvider;
+    }
+
+    public function name()
+    {
+        return 'byteplus-resolve-endpoint-interceptor';
     }
 
     public function intercept(Context $context)
@@ -38,9 +46,15 @@ class ResolveEndpointInterceptor extends Interceptor
             }
         }
 
+        LogHelper::debug($context->request->logger, $context->request->logLevel, SdkLogger::LOG_ENDPOINT,
+            'Endpoint service={service} region={region} host={host}', [
+                'service' => $context->request->service ?: (isset($service) ? $service : ''),
+                'region' => $context->request->region,
+                'host' => $context->request->host,
+            ]
+        );
+
         $context->request->url = $prefix . $context->request->truePath;
         return $context;
     }
 }
-
-?>

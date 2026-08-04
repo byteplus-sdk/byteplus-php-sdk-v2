@@ -11,6 +11,7 @@ The Byteplus PHP SDK supports explicit credentials and `CredentialProvider`-base
 | Provider | Purpose | Refresh Support | Typical Scenario |
 | --- | --- | --- | --- |
 | Direct `Configuration` (`AK/SK` or `AK/SK/Token`) | Explicit static or temporary credentials | No | Simple server-side integration |
+| `StaticCredentialProvider` | Static credentials through the provider interface | No | Custom provider chains or provider-based client setup |
 | `StsProvider` | STS AssumeRole | Yes | Role-based temporary credentials |
 | `OidcCredentialProvider` | STS AssumeRoleWithOIDC | Yes | OIDC federation |
 | `SamlCredentialProvider` | STS AssumeRoleWithSAML | Yes | SAML federation |
@@ -106,6 +107,25 @@ try {
 ?>
 ```
 
+### Static Credential Provider
+
+Direct `setAk()` / `setSk()` remains the simplest path. Use `StaticCredentialProvider` when your code expects a `CredentialProvider`.
+
+```php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$config = \Byteplus\Common\Configuration::getDefaultConfiguration()
+    ->setRegion("cn-beijing")
+    ->setCredentialProvider(
+        new \Byteplus\Common\Auth\Providers\StaticCredentialProvider(
+            "Your AK",
+            "Your SK",
+            "Your session token" // optional
+        )
+    );
+```
+
 ### AssumeRole
 
 AssumeRole provides dynamic credentials. `StsProvider::getCredentials()` caches the returned credentials and refreshes them 60 seconds before `ExpiredTime`. It validates the required STS fields and retries transient failures. The default endpoint and signing region are `sts.ap-southeast-1.byteplusapi.com` and `ap-southeast-1`.
@@ -131,6 +151,12 @@ $sts = new \Byteplus\Common\Auth\Providers\StsProvider(
     "sts.ap-southeast-1.byteplusapi.com", // optional; default shown
     '{"Statement":[{"Effect":"Allow","Action":["vpc:CreateVpc"],"Resource":["*"],"Condition":{"StringEquals":{"byteplus:RequestedRegion":["cn-beijing"]}}}]}' // optional
 );
+
+// Optional: tune transport and retry settings. maxRetries means extra retries.
+// $sts->setConnectTimeout(5)
+//     ->setReadTimeout(30)
+//     ->setMaxRetries(3)
+//     ->setRetryInterval(1);
 
 try {
     $result = $sts->getCredentials();
