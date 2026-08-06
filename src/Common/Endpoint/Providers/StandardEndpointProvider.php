@@ -370,6 +370,8 @@ class StandardEndpointProvider extends EndpointProvider
         }
 
         $fmt = $this->fmt ?: self::DEFAULT_FORMAT;
+        $this->variables->region = '';
+        $this->variables->cnSuffix = '';
         $this->variables->service = self::standardizeDomainServiceCode($service);
 
         $serviceInfos = self::serviceInfos();

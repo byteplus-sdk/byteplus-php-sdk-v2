@@ -11,6 +11,7 @@ Byteplus PHP SDK 同时支持显式凭证配置，以及基于 `CredentialProvid
 | Provider | 用途 | 是否自动刷新 | 典型场景 |
 | --- | --- | --- | --- |
 | 直接在 `Configuration` 中设置 `AK/SK` 或 `AK/SK/Token` | 显式传入固定或临时凭证 | 否 | 简单服务端接入 |
+| `StaticCredentialProvider` | 通过 Provider 接口传入固定凭证 | 否 | 自定义凭证链或要求使用 Provider 的客户端初始化 |
 | `StsProvider` | STS AssumeRole | 是 | 基于角色的临时凭证 |
 | `OidcCredentialProvider` | STS AssumeRoleWithOIDC | 是 | OIDC 联邦身份 |
 | `SamlCredentialProvider` | STS AssumeRoleWithSAML | 是 | SAML 联邦身份 |
@@ -108,6 +109,25 @@ try {
 ?>
 ```
 
+### Static Credential Provider
+
+直接使用 `setAk()` / `setSk()` 仍是最简单的方式。只有当代码需要传入 `CredentialProvider` 时，再使用 `StaticCredentialProvider`。
+
+```php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$config = \Byteplus\Common\Configuration::getDefaultConfiguration()
+    ->setRegion("cn-beijing")
+    ->setCredentialProvider(
+        new \Byteplus\Common\Auth\Providers\StaticCredentialProvider(
+            "Your AK",
+            "Your SK",
+            "Your session token" // 可选
+        )
+    );
+```
+
 ### AssumeRole
 
 动态访问凭证信息。`StsProvider::getCredentials()` 会缓存 STS `AssumeRole` 返回的凭证，并在 `ExpiredTime` 前 60 秒刷新，同时校验必需字段并对临时失败进行重试。默认 endpoint 为 `sts.ap-southeast-1.byteplusapi.com`，签名 region 为 `ap-southeast-1`。
@@ -133,6 +153,12 @@ $sts = new \Byteplus\Common\Auth\Providers\StsProvider(
     "sts.ap-southeast-1.byteplusapi.com", # 非必填，请求域名，默认值如左
     '{"Statement":[{"Effect":"Allow","Action":["vpc:CreateVpc"],"Resource":["*"],"Condition":{"StringEquals":{"byteplus:RequestedRegion":["cn-beijing"]}}}]}' # 非必填，授权策略，默认为空
 );
+
+// 可选：调整传输和重试配置。maxRetries 表示额外重试次数。
+// $sts->setConnectTimeout(5)
+//     ->setReadTimeout(30)
+//     ->setMaxRetries(3)
+//     ->setRetryInterval(1);
 
 try {
     $result = $sts->getCredentials();
