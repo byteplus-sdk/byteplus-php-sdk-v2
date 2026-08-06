@@ -8,7 +8,7 @@ class Configuration
 {
     private static $defaultConfiguration;
 
-    protected $region = 'cn-beijing';
+    protected $region = 'ap-southeast-1';
 
     protected $schema = 'https';
     protected $endpointProvider;
