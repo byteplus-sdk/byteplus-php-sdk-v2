@@ -37,7 +37,7 @@ class Configuration
     protected $httpProxy;
     protected $httpsProxy;
 
-    protected $userAgent = 'byteplus-php-sdk-v2/1.0.3';
+    protected $userAgent = 'byteplus-php-sdk-v2/1.0.4';
     protected $sdkUserAgent;
     protected $debug = false;
     protected $debugFile = 'php://output';
