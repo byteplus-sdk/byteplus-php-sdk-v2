@@ -36,7 +36,7 @@ class DefaultEndpointProvider extends EndpointProvider
             'vke'            => new ServiceEndpointInfo('vke', false, true),
             'auto_scaling'   => new ServiceEndpointInfo('auto_scaling', false, true),
             'storage_ebs'    => new ServiceEndpointInfo('storage_ebs', false, true),
-            'vedbm'          => new ServiceEndpointInfo('vedbm', false, true),
+            'vedbm' => new ServiceEndpointInfo('vedbm', false, true),
             'privatelink'    => new ServiceEndpointInfo('privatelink', false, true),
             'clb'            => new ServiceEndpointInfo('clb', false, true),
             'transitrouter'  => new ServiceEndpointInfo('transitrouter', false, true),

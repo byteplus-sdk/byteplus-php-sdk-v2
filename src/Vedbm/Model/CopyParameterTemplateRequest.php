@@ -11,7 +11,7 @@ use ArrayAccess;
 use Byteplus\Common\ObjectSerializer;
 use Byteplus\Common\ModelInterface;
 
-class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
+class CopyParameterTemplateRequest implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -20,7 +20,7 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
       *
       * @var string
       */
-    protected static $swaggerModelName = 'NodeForDescribeDBInstancesOutput';
+    protected static $swaggerModelName = 'CopyParameterTemplateRequest';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -28,14 +28,9 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'failover_priority' => 'int',
-        'memory' => 'int',
-        'node_id' => 'string',
-        'node_spec' => 'string',
-        'node_type' => 'string',
-        'sub_instance_type' => 'string',
-        'zone_id' => 'string',
-        'v_cpu' => 'int'
+        'source_template_id' => 'string',
+        'template_description' => 'string',
+        'template_name' => 'string'
     ];
 
     /**
@@ -44,14 +39,9 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'failover_priority' => 'int32',
-        'memory' => 'int32',
-        'node_id' => null,
-        'node_spec' => null,
-        'node_type' => null,
-        'sub_instance_type' => null,
-        'zone_id' => null,
-        'v_cpu' => 'int32'
+        'source_template_id' => null,
+        'template_description' => null,
+        'template_name' => null
     ];
 
     /**
@@ -81,14 +71,9 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'failover_priority' => 'FailoverPriority',
-        'memory' => 'Memory',
-        'node_id' => 'NodeId',
-        'node_spec' => 'NodeSpec',
-        'node_type' => 'NodeType',
-        'sub_instance_type' => 'SubInstanceType',
-        'zone_id' => 'ZoneId',
-        'v_cpu' => 'vCPU'
+        'source_template_id' => 'SourceTemplateId',
+        'template_description' => 'TemplateDescription',
+        'template_name' => 'TemplateName'
     ];
 
     /**
@@ -97,14 +82,9 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'failover_priority' => 'setFailoverPriority',
-        'memory' => 'setMemory',
-        'node_id' => 'setNodeId',
-        'node_spec' => 'setNodeSpec',
-        'node_type' => 'setNodeType',
-        'sub_instance_type' => 'setSubInstanceType',
-        'zone_id' => 'setZoneId',
-        'v_cpu' => 'setVCpu'
+        'source_template_id' => 'setSourceTemplateId',
+        'template_description' => 'setTemplateDescription',
+        'template_name' => 'setTemplateName'
     ];
 
     /**
@@ -113,14 +93,9 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'failover_priority' => 'getFailoverPriority',
-        'memory' => 'getMemory',
-        'node_id' => 'getNodeId',
-        'node_spec' => 'getNodeSpec',
-        'node_type' => 'getNodeType',
-        'sub_instance_type' => 'getSubInstanceType',
-        'zone_id' => 'getZoneId',
-        'v_cpu' => 'getVCpu'
+        'source_template_id' => 'getSourceTemplateId',
+        'template_description' => 'getTemplateDescription',
+        'template_name' => 'getTemplateName'
     ];
 
     /**
@@ -183,14 +158,9 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
      */
     public function __construct($data = null)
     {
-        $this->container['failover_priority'] = isset($data['failover_priority']) ? $data['failover_priority'] : null;
-        $this->container['memory'] = isset($data['memory']) ? $data['memory'] : null;
-        $this->container['node_id'] = isset($data['node_id']) ? $data['node_id'] : null;
-        $this->container['node_spec'] = isset($data['node_spec']) ? $data['node_spec'] : null;
-        $this->container['node_type'] = isset($data['node_type']) ? $data['node_type'] : null;
-        $this->container['sub_instance_type'] = isset($data['sub_instance_type']) ? $data['sub_instance_type'] : null;
-        $this->container['zone_id'] = isset($data['zone_id']) ? $data['zone_id'] : null;
-        $this->container['v_cpu'] = isset($data['v_cpu']) ? $data['v_cpu'] : null;
+        $this->container['source_template_id'] = isset($data['source_template_id']) ? $data['source_template_id'] : null;
+        $this->container['template_description'] = isset($data['template_description']) ? $data['template_description'] : null;
+        $this->container['template_name'] = isset($data['template_name']) ? $data['template_name'] : null;
     }
 
     /**
@@ -202,6 +172,12 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
     {
         $invalidProperties = [];
 
+        if ($this->container['source_template_id'] === null) {
+            $invalidProperties[] = "'source_template_id' can't be null";
+        }
+        if ($this->container['template_name'] === null) {
+            $invalidProperties[] = "'template_name' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -218,193 +194,73 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
 
 
     /**
-     * Gets failover_priority
-     *
-     * @return int
-     */
-    public function getFailoverPriority()
-    {
-        return $this->container['failover_priority'];
-    }
-
-    /**
-     * Sets failover_priority
-     *
-     * @param int $failover_priority failover_priority
-     *
-     * @return $this
-     */
-    public function setFailoverPriority($failover_priority)
-    {
-        $this->container['failover_priority'] = $failover_priority;
-
-        return $this;
-    }
-
-    /**
-     * Gets memory
-     *
-     * @return int
-     */
-    public function getMemory()
-    {
-        return $this->container['memory'];
-    }
-
-    /**
-     * Sets memory
-     *
-     * @param int $memory memory
-     *
-     * @return $this
-     */
-    public function setMemory($memory)
-    {
-        $this->container['memory'] = $memory;
-
-        return $this;
-    }
-
-    /**
-     * Gets node_id
+     * Gets source_template_id
      *
      * @return string
      */
-    public function getNodeId()
+    public function getSourceTemplateId()
     {
-        return $this->container['node_id'];
+        return $this->container['source_template_id'];
     }
 
     /**
-     * Sets node_id
+     * Sets source_template_id
      *
-     * @param string $node_id node_id
+     * @param string $source_template_id source_template_id
      *
      * @return $this
      */
-    public function setNodeId($node_id)
+    public function setSourceTemplateId($source_template_id)
     {
-        $this->container['node_id'] = $node_id;
+        $this->container['source_template_id'] = $source_template_id;
 
         return $this;
     }
 
     /**
-     * Gets node_spec
+     * Gets template_description
      *
      * @return string
      */
-    public function getNodeSpec()
+    public function getTemplateDescription()
     {
-        return $this->container['node_spec'];
+        return $this->container['template_description'];
     }
 
     /**
-     * Sets node_spec
+     * Sets template_description
      *
-     * @param string $node_spec node_spec
+     * @param string $template_description template_description
      *
      * @return $this
      */
-    public function setNodeSpec($node_spec)
+    public function setTemplateDescription($template_description)
     {
-        $this->container['node_spec'] = $node_spec;
+        $this->container['template_description'] = $template_description;
 
         return $this;
     }
 
     /**
-     * Gets node_type
+     * Gets template_name
      *
      * @return string
      */
-    public function getNodeType()
+    public function getTemplateName()
     {
-        return $this->container['node_type'];
+        return $this->container['template_name'];
     }
 
     /**
-     * Sets node_type
+     * Sets template_name
      *
-     * @param string $node_type node_type
+     * @param string $template_name template_name
      *
      * @return $this
      */
-    public function setNodeType($node_type)
+    public function setTemplateName($template_name)
     {
-        $this->container['node_type'] = $node_type;
-
-        return $this;
-    }
-
-    /**
-     * Gets sub_instance_type
-     *
-     * @return string
-     */
-    public function getSubInstanceType()
-    {
-        return $this->container['sub_instance_type'];
-    }
-
-    /**
-     * Sets sub_instance_type
-     *
-     * @param string $sub_instance_type sub_instance_type
-     *
-     * @return $this
-     */
-    public function setSubInstanceType($sub_instance_type)
-    {
-        $this->container['sub_instance_type'] = $sub_instance_type;
-
-        return $this;
-    }
-
-    /**
-     * Gets zone_id
-     *
-     * @return string
-     */
-    public function getZoneId()
-    {
-        return $this->container['zone_id'];
-    }
-
-    /**
-     * Sets zone_id
-     *
-     * @param string $zone_id zone_id
-     *
-     * @return $this
-     */
-    public function setZoneId($zone_id)
-    {
-        $this->container['zone_id'] = $zone_id;
-
-        return $this;
-    }
-
-    /**
-     * Gets v_cpu
-     *
-     * @return int
-     */
-    public function getVCpu()
-    {
-        return $this->container['v_cpu'];
-    }
-
-    /**
-     * Sets v_cpu
-     *
-     * @param int $v_cpu v_cpu
-     *
-     * @return $this
-     */
-    public function setVCpu($v_cpu)
-    {
-        $this->container['v_cpu'] = $v_cpu;
+        $this->container['template_name'] = $template_name;
 
         return $this;
     }
