@@ -378,6 +378,68 @@ class VEDBMApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function copyParameterTemplate($body = null)
+    {
+        list($response) = $this->copyParameterTemplateWithHttpInfo($body);
+        return $response;
+    }
+
+    public function copyParameterTemplateWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vedbm\Model\CopyParameterTemplateResponse';
+        $request = $this->copyParameterTemplateRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function copyParameterTemplateAsync($body = null)
+    {
+        return $this->copyParameterTemplateAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function copyParameterTemplateAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vedbm\Model\CopyParameterTemplateResponse';
+        $request = $this->copyParameterTemplateRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function copyParameterTemplateRequest($body)
+    {
+        $resourcePath = '/CopyParameterTemplate/2022-01-01/vedbm/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function createAllowList($body = null)
     {
         list($response) = $this->createAllowListWithHttpInfo($body);
@@ -3230,6 +3292,68 @@ class VEDBMApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function modifyConnectionPersistence($body = null)
+    {
+        list($response) = $this->modifyConnectionPersistenceWithHttpInfo($body);
+        return $response;
+    }
+
+    public function modifyConnectionPersistenceWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vedbm\Model\ModifyConnectionPersistenceResponse';
+        $request = $this->modifyConnectionPersistenceRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function modifyConnectionPersistenceAsync($body = null)
+    {
+        return $this->modifyConnectionPersistenceAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function modifyConnectionPersistenceAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vedbm\Model\ModifyConnectionPersistenceResponse';
+        $request = $this->modifyConnectionPersistenceRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function modifyConnectionPersistenceRequest($body)
+    {
+        $resourcePath = '/ModifyConnectionPersistence/2022-01-01/vedbm/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function modifyCrossRegionBackupPolicy($body = null)
     {
         list($response) = $this->modifyCrossRegionBackupPolicyWithHttpInfo($body);
@@ -3912,6 +4036,68 @@ class VEDBMApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function modifyDBInstanceStorageType($body = null)
+    {
+        list($response) = $this->modifyDBInstanceStorageTypeWithHttpInfo($body);
+        return $response;
+    }
+
+    public function modifyDBInstanceStorageTypeWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vedbm\Model\ModifyDBInstanceStorageTypeResponse';
+        $request = $this->modifyDBInstanceStorageTypeRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function modifyDBInstanceStorageTypeAsync($body = null)
+    {
+        return $this->modifyDBInstanceStorageTypeAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function modifyDBInstanceStorageTypeAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vedbm\Model\ModifyDBInstanceStorageTypeResponse';
+        $request = $this->modifyDBInstanceStorageTypeRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function modifyDBInstanceStorageTypeRequest($body)
+    {
+        $resourcePath = '/ModifyDBInstanceStorageType/2022-01-01/vedbm/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function modifyDBNodeConfig($body = null)
     {
         list($response) = $this->modifyDBNodeConfigWithHttpInfo($body);
@@ -4008,6 +4194,68 @@ class VEDBMApi
     protected function modifyDatabaseDescriptionRequest($body)
     {
         $resourcePath = '/ModifyDatabaseDescription/2022-01-01/vedbm/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function modifyParameterTemplate($body = null)
+    {
+        list($response) = $this->modifyParameterTemplateWithHttpInfo($body);
+        return $response;
+    }
+
+    public function modifyParameterTemplateWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vedbm\Model\ModifyParameterTemplateResponse';
+        $request = $this->modifyParameterTemplateRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function modifyParameterTemplateAsync($body = null)
+    {
+        return $this->modifyParameterTemplateAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function modifyParameterTemplateAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vedbm\Model\ModifyParameterTemplateResponse';
+        $request = $this->modifyParameterTemplateRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function modifyParameterTemplateRequest($body)
+    {
+        $resourcePath = '/ModifyParameterTemplate/2022-01-01/vedbm/post/application_json/';
         $queryParams = [];
         $httpBody = $body;
 

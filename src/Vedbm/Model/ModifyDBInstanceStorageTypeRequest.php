@@ -11,7 +11,7 @@ use ArrayAccess;
 use Byteplus\Common\ObjectSerializer;
 use Byteplus\Common\ModelInterface;
 
-class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, ArrayAccess
+class ModifyDBInstanceStorageTypeRequest implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -20,7 +20,7 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
       *
       * @var string
       */
-    protected static $swaggerModelName = 'DatabasesPrivilegeForDescribeDatabasesOutput';
+    protected static $swaggerModelName = 'ModifyDBInstanceStorageTypeRequest';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -28,9 +28,8 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'account_name' => 'string',
-        'account_privilege' => 'string',
-        'account_privilege_detail' => 'string'
+        'instance_id' => 'string',
+        'storage_type' => 'string'
     ];
 
     /**
@@ -39,9 +38,8 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'account_name' => null,
-        'account_privilege' => null,
-        'account_privilege_detail' => null
+        'instance_id' => null,
+        'storage_type' => null
     ];
 
     /**
@@ -71,9 +69,8 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
      * @var string[]
      */
     protected static $attributeMap = [
-        'account_name' => 'AccountName',
-        'account_privilege' => 'AccountPrivilege',
-        'account_privilege_detail' => 'AccountPrivilegeDetail'
+        'instance_id' => 'InstanceId',
+        'storage_type' => 'StorageType'
     ];
 
     /**
@@ -82,9 +79,8 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
      * @var string[]
      */
     protected static $setters = [
-        'account_name' => 'setAccountName',
-        'account_privilege' => 'setAccountPrivilege',
-        'account_privilege_detail' => 'setAccountPrivilegeDetail'
+        'instance_id' => 'setInstanceId',
+        'storage_type' => 'setStorageType'
     ];
 
     /**
@@ -93,9 +89,8 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
      * @var string[]
      */
     protected static $getters = [
-        'account_name' => 'getAccountName',
-        'account_privilege' => 'getAccountPrivilege',
-        'account_privilege_detail' => 'getAccountPrivilegeDetail'
+        'instance_id' => 'getInstanceId',
+        'storage_type' => 'getStorageType'
     ];
 
     /**
@@ -139,8 +134,23 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
         return self::$swaggerModelName;
     }
 
+    const STORAGE_TYPE_IO_OPTIMIZED_STORAGE = 'IOOptimizedStorage';
+    const STORAGE_TYPE_SMART_COMPRESSED_STORAGE = 'SmartCompressedStorage';
     
 
+    
+    /**
+     * Gets allowable values of the enum
+     *
+     * @return string[]
+     */
+    public function getStorageTypeAllowableValues()
+    {
+        return [
+            self::STORAGE_TYPE_IO_OPTIMIZED_STORAGE,
+            self::STORAGE_TYPE_SMART_COMPRESSED_STORAGE,
+        ];
+    }
     
 
     /**
@@ -158,9 +168,8 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
      */
     public function __construct($data = null)
     {
-        $this->container['account_name'] = isset($data['account_name']) ? $data['account_name'] : null;
-        $this->container['account_privilege'] = isset($data['account_privilege']) ? $data['account_privilege'] : null;
-        $this->container['account_privilege_detail'] = isset($data['account_privilege_detail']) ? $data['account_privilege_detail'] : null;
+        $this->container['instance_id'] = isset($data['instance_id']) ? $data['instance_id'] : null;
+        $this->container['storage_type'] = isset($data['storage_type']) ? $data['storage_type'] : null;
     }
 
     /**
@@ -171,6 +180,17 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
     public function listInvalidProperties()
     {
         $invalidProperties = [];
+
+        if ($this->container['instance_id'] === null) {
+            $invalidProperties[] = "'instance_id' can't be null";
+        }
+        $allowedValues = $this->getStorageTypeAllowableValues();
+        if (!is_null($this->container['storage_type']) && !in_array($this->container['storage_type'], $allowedValues, true)) {
+            $invalidProperties[] = sprintf(
+                "invalid value for 'storage_type', must be one of '%s'",
+                implode("', '", $allowedValues)
+            );
+        }
 
         return $invalidProperties;
     }
@@ -188,73 +208,58 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
 
 
     /**
-     * Gets account_name
+     * Gets instance_id
      *
      * @return string
      */
-    public function getAccountName()
+    public function getInstanceId()
     {
-        return $this->container['account_name'];
+        return $this->container['instance_id'];
     }
 
     /**
-     * Sets account_name
+     * Sets instance_id
      *
-     * @param string $account_name account_name
+     * @param string $instance_id instance_id
      *
      * @return $this
      */
-    public function setAccountName($account_name)
+    public function setInstanceId($instance_id)
     {
-        $this->container['account_name'] = $account_name;
+        $this->container['instance_id'] = $instance_id;
 
         return $this;
     }
 
     /**
-     * Gets account_privilege
+     * Gets storage_type
      *
      * @return string
      */
-    public function getAccountPrivilege()
+    public function getStorageType()
     {
-        return $this->container['account_privilege'];
+        return $this->container['storage_type'];
     }
 
     /**
-     * Sets account_privilege
+     * Sets storage_type
      *
-     * @param string $account_privilege account_privilege
+     * @param string $storage_type storage_type
      *
      * @return $this
      */
-    public function setAccountPrivilege($account_privilege)
+    public function setStorageType($storage_type)
     {
-        $this->container['account_privilege'] = $account_privilege;
-
-        return $this;
-    }
-
-    /**
-     * Gets account_privilege_detail
-     *
-     * @return string
-     */
-    public function getAccountPrivilegeDetail()
-    {
-        return $this->container['account_privilege_detail'];
-    }
-
-    /**
-     * Sets account_privilege_detail
-     *
-     * @param string $account_privilege_detail account_privilege_detail
-     *
-     * @return $this
-     */
-    public function setAccountPrivilegeDetail($account_privilege_detail)
-    {
-        $this->container['account_privilege_detail'] = $account_privilege_detail;
+        $allowedValues = $this->getStorageTypeAllowableValues();
+        if (!is_null($storage_type) && !in_array($storage_type, $allowedValues, true)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "Invalid value for 'storage_type', must be one of '%s'",
+                    implode("', '", $allowedValues)
+                )
+            );
+        }
+        $this->container['storage_type'] = $storage_type;
 
         return $this;
     }

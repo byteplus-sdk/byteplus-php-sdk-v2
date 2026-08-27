@@ -11,7 +11,7 @@ use ArrayAccess;
 use Byteplus\Common\ObjectSerializer;
 use Byteplus\Common\ModelInterface;
 
-class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, ArrayAccess
+class TemplateParameterForModifyParameterTemplateInput implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -20,7 +20,7 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
       *
       * @var string
       */
-    protected static $swaggerModelName = 'DatabasesPrivilegeForDescribeDatabasesOutput';
+    protected static $swaggerModelName = 'TemplateParameterForModifyParameterTemplateInput';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -28,9 +28,8 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'account_name' => 'string',
-        'account_privilege' => 'string',
-        'account_privilege_detail' => 'string'
+        'parameter_name' => 'string',
+        'parameter_value' => 'string'
     ];
 
     /**
@@ -39,9 +38,8 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'account_name' => null,
-        'account_privilege' => null,
-        'account_privilege_detail' => null
+        'parameter_name' => null,
+        'parameter_value' => null
     ];
 
     /**
@@ -71,9 +69,8 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
      * @var string[]
      */
     protected static $attributeMap = [
-        'account_name' => 'AccountName',
-        'account_privilege' => 'AccountPrivilege',
-        'account_privilege_detail' => 'AccountPrivilegeDetail'
+        'parameter_name' => 'ParameterName',
+        'parameter_value' => 'ParameterValue'
     ];
 
     /**
@@ -82,9 +79,8 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
      * @var string[]
      */
     protected static $setters = [
-        'account_name' => 'setAccountName',
-        'account_privilege' => 'setAccountPrivilege',
-        'account_privilege_detail' => 'setAccountPrivilegeDetail'
+        'parameter_name' => 'setParameterName',
+        'parameter_value' => 'setParameterValue'
     ];
 
     /**
@@ -93,9 +89,8 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
      * @var string[]
      */
     protected static $getters = [
-        'account_name' => 'getAccountName',
-        'account_privilege' => 'getAccountPrivilege',
-        'account_privilege_detail' => 'getAccountPrivilegeDetail'
+        'parameter_name' => 'getParameterName',
+        'parameter_value' => 'getParameterValue'
     ];
 
     /**
@@ -158,9 +153,8 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
      */
     public function __construct($data = null)
     {
-        $this->container['account_name'] = isset($data['account_name']) ? $data['account_name'] : null;
-        $this->container['account_privilege'] = isset($data['account_privilege']) ? $data['account_privilege'] : null;
-        $this->container['account_privilege_detail'] = isset($data['account_privilege_detail']) ? $data['account_privilege_detail'] : null;
+        $this->container['parameter_name'] = isset($data['parameter_name']) ? $data['parameter_name'] : null;
+        $this->container['parameter_value'] = isset($data['parameter_value']) ? $data['parameter_value'] : null;
     }
 
     /**
@@ -188,73 +182,49 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
 
 
     /**
-     * Gets account_name
+     * Gets parameter_name
      *
      * @return string
      */
-    public function getAccountName()
+    public function getParameterName()
     {
-        return $this->container['account_name'];
+        return $this->container['parameter_name'];
     }
 
     /**
-     * Sets account_name
+     * Sets parameter_name
      *
-     * @param string $account_name account_name
+     * @param string $parameter_name parameter_name
      *
      * @return $this
      */
-    public function setAccountName($account_name)
+    public function setParameterName($parameter_name)
     {
-        $this->container['account_name'] = $account_name;
+        $this->container['parameter_name'] = $parameter_name;
 
         return $this;
     }
 
     /**
-     * Gets account_privilege
+     * Gets parameter_value
      *
      * @return string
      */
-    public function getAccountPrivilege()
+    public function getParameterValue()
     {
-        return $this->container['account_privilege'];
+        return $this->container['parameter_value'];
     }
 
     /**
-     * Sets account_privilege
+     * Sets parameter_value
      *
-     * @param string $account_privilege account_privilege
+     * @param string $parameter_value parameter_value
      *
      * @return $this
      */
-    public function setAccountPrivilege($account_privilege)
+    public function setParameterValue($parameter_value)
     {
-        $this->container['account_privilege'] = $account_privilege;
-
-        return $this;
-    }
-
-    /**
-     * Gets account_privilege_detail
-     *
-     * @return string
-     */
-    public function getAccountPrivilegeDetail()
-    {
-        return $this->container['account_privilege_detail'];
-    }
-
-    /**
-     * Sets account_privilege_detail
-     *
-     * @param string $account_privilege_detail account_privilege_detail
-     *
-     * @return $this
-     */
-    public function setAccountPrivilegeDetail($account_privilege_detail)
-    {
-        $this->container['account_privilege_detail'] = $account_privilege_detail;
+        $this->container['parameter_value'] = $parameter_value;
 
         return $this;
     }

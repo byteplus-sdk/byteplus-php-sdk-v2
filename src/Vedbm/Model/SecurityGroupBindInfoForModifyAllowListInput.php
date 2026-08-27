@@ -11,7 +11,7 @@ use ArrayAccess;
 use Byteplus\Common\ObjectSerializer;
 use Byteplus\Common\ModelInterface;
 
-class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
+class SecurityGroupBindInfoForModifyAllowListInput implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -20,7 +20,7 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
       *
       * @var string
       */
-    protected static $swaggerModelName = 'NodeForDescribeDBInstancesOutput';
+    protected static $swaggerModelName = 'SecurityGroupBindInfoForModifyAllowListInput';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -28,14 +28,10 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'failover_priority' => 'int',
-        'memory' => 'int',
-        'node_id' => 'string',
-        'node_spec' => 'string',
-        'node_type' => 'string',
-        'sub_instance_type' => 'string',
-        'zone_id' => 'string',
-        'v_cpu' => 'int'
+        'bind_mode' => 'string',
+        'ip_list' => 'string[]',
+        'security_group_id' => 'string',
+        'security_group_name' => 'string'
     ];
 
     /**
@@ -44,14 +40,10 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'failover_priority' => 'int32',
-        'memory' => 'int32',
-        'node_id' => null,
-        'node_spec' => null,
-        'node_type' => null,
-        'sub_instance_type' => null,
-        'zone_id' => null,
-        'v_cpu' => 'int32'
+        'bind_mode' => null,
+        'ip_list' => null,
+        'security_group_id' => null,
+        'security_group_name' => null
     ];
 
     /**
@@ -81,14 +73,10 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'failover_priority' => 'FailoverPriority',
-        'memory' => 'Memory',
-        'node_id' => 'NodeId',
-        'node_spec' => 'NodeSpec',
-        'node_type' => 'NodeType',
-        'sub_instance_type' => 'SubInstanceType',
-        'zone_id' => 'ZoneId',
-        'v_cpu' => 'vCPU'
+        'bind_mode' => 'BindMode',
+        'ip_list' => 'IpList',
+        'security_group_id' => 'SecurityGroupId',
+        'security_group_name' => 'SecurityGroupName'
     ];
 
     /**
@@ -97,14 +85,10 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'failover_priority' => 'setFailoverPriority',
-        'memory' => 'setMemory',
-        'node_id' => 'setNodeId',
-        'node_spec' => 'setNodeSpec',
-        'node_type' => 'setNodeType',
-        'sub_instance_type' => 'setSubInstanceType',
-        'zone_id' => 'setZoneId',
-        'v_cpu' => 'setVCpu'
+        'bind_mode' => 'setBindMode',
+        'ip_list' => 'setIpList',
+        'security_group_id' => 'setSecurityGroupId',
+        'security_group_name' => 'setSecurityGroupName'
     ];
 
     /**
@@ -113,14 +97,10 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'failover_priority' => 'getFailoverPriority',
-        'memory' => 'getMemory',
-        'node_id' => 'getNodeId',
-        'node_spec' => 'getNodeSpec',
-        'node_type' => 'getNodeType',
-        'sub_instance_type' => 'getSubInstanceType',
-        'zone_id' => 'getZoneId',
-        'v_cpu' => 'getVCpu'
+        'bind_mode' => 'getBindMode',
+        'ip_list' => 'getIpList',
+        'security_group_id' => 'getSecurityGroupId',
+        'security_group_name' => 'getSecurityGroupName'
     ];
 
     /**
@@ -164,8 +144,23 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
         return self::$swaggerModelName;
     }
 
+    const BIND_MODE_ASSOCIATE_ECS_IP = 'AssociateEcsIp';
+    const BIND_MODE_INGRESS_DIRECTION_IP = 'IngressDirectionIp';
     
 
+    
+    /**
+     * Gets allowable values of the enum
+     *
+     * @return string[]
+     */
+    public function getBindModeAllowableValues()
+    {
+        return [
+            self::BIND_MODE_ASSOCIATE_ECS_IP,
+            self::BIND_MODE_INGRESS_DIRECTION_IP,
+        ];
+    }
     
 
     /**
@@ -183,14 +178,10 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
      */
     public function __construct($data = null)
     {
-        $this->container['failover_priority'] = isset($data['failover_priority']) ? $data['failover_priority'] : null;
-        $this->container['memory'] = isset($data['memory']) ? $data['memory'] : null;
-        $this->container['node_id'] = isset($data['node_id']) ? $data['node_id'] : null;
-        $this->container['node_spec'] = isset($data['node_spec']) ? $data['node_spec'] : null;
-        $this->container['node_type'] = isset($data['node_type']) ? $data['node_type'] : null;
-        $this->container['sub_instance_type'] = isset($data['sub_instance_type']) ? $data['sub_instance_type'] : null;
-        $this->container['zone_id'] = isset($data['zone_id']) ? $data['zone_id'] : null;
-        $this->container['v_cpu'] = isset($data['v_cpu']) ? $data['v_cpu'] : null;
+        $this->container['bind_mode'] = isset($data['bind_mode']) ? $data['bind_mode'] : null;
+        $this->container['ip_list'] = isset($data['ip_list']) ? $data['ip_list'] : null;
+        $this->container['security_group_id'] = isset($data['security_group_id']) ? $data['security_group_id'] : null;
+        $this->container['security_group_name'] = isset($data['security_group_name']) ? $data['security_group_name'] : null;
     }
 
     /**
@@ -201,6 +192,14 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
     public function listInvalidProperties()
     {
         $invalidProperties = [];
+
+        $allowedValues = $this->getBindModeAllowableValues();
+        if (!is_null($this->container['bind_mode']) && !in_array($this->container['bind_mode'], $allowedValues, true)) {
+            $invalidProperties[] = sprintf(
+                "invalid value for 'bind_mode', must be one of '%s'",
+                implode("', '", $allowedValues)
+            );
+        }
 
         return $invalidProperties;
     }
@@ -218,193 +217,106 @@ class NodeForDescribeDBInstancesOutput implements ModelInterface, ArrayAccess
 
 
     /**
-     * Gets failover_priority
-     *
-     * @return int
-     */
-    public function getFailoverPriority()
-    {
-        return $this->container['failover_priority'];
-    }
-
-    /**
-     * Sets failover_priority
-     *
-     * @param int $failover_priority failover_priority
-     *
-     * @return $this
-     */
-    public function setFailoverPriority($failover_priority)
-    {
-        $this->container['failover_priority'] = $failover_priority;
-
-        return $this;
-    }
-
-    /**
-     * Gets memory
-     *
-     * @return int
-     */
-    public function getMemory()
-    {
-        return $this->container['memory'];
-    }
-
-    /**
-     * Sets memory
-     *
-     * @param int $memory memory
-     *
-     * @return $this
-     */
-    public function setMemory($memory)
-    {
-        $this->container['memory'] = $memory;
-
-        return $this;
-    }
-
-    /**
-     * Gets node_id
+     * Gets bind_mode
      *
      * @return string
      */
-    public function getNodeId()
+    public function getBindMode()
     {
-        return $this->container['node_id'];
+        return $this->container['bind_mode'];
     }
 
     /**
-     * Sets node_id
+     * Sets bind_mode
      *
-     * @param string $node_id node_id
+     * @param string $bind_mode bind_mode
      *
      * @return $this
      */
-    public function setNodeId($node_id)
+    public function setBindMode($bind_mode)
     {
-        $this->container['node_id'] = $node_id;
+        $allowedValues = $this->getBindModeAllowableValues();
+        if (!is_null($bind_mode) && !in_array($bind_mode, $allowedValues, true)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "Invalid value for 'bind_mode', must be one of '%s'",
+                    implode("', '", $allowedValues)
+                )
+            );
+        }
+        $this->container['bind_mode'] = $bind_mode;
 
         return $this;
     }
 
     /**
-     * Gets node_spec
+     * Gets ip_list
+     *
+     * @return string[]
+     */
+    public function getIpList()
+    {
+        return $this->container['ip_list'];
+    }
+
+    /**
+     * Sets ip_list
+     *
+     * @param string[] $ip_list ip_list
+     *
+     * @return $this
+     */
+    public function setIpList($ip_list)
+    {
+        $this->container['ip_list'] = $ip_list;
+
+        return $this;
+    }
+
+    /**
+     * Gets security_group_id
      *
      * @return string
      */
-    public function getNodeSpec()
+    public function getSecurityGroupId()
     {
-        return $this->container['node_spec'];
+        return $this->container['security_group_id'];
     }
 
     /**
-     * Sets node_spec
+     * Sets security_group_id
      *
-     * @param string $node_spec node_spec
+     * @param string $security_group_id security_group_id
      *
      * @return $this
      */
-    public function setNodeSpec($node_spec)
+    public function setSecurityGroupId($security_group_id)
     {
-        $this->container['node_spec'] = $node_spec;
+        $this->container['security_group_id'] = $security_group_id;
 
         return $this;
     }
 
     /**
-     * Gets node_type
+     * Gets security_group_name
      *
      * @return string
      */
-    public function getNodeType()
+    public function getSecurityGroupName()
     {
-        return $this->container['node_type'];
+        return $this->container['security_group_name'];
     }
 
     /**
-     * Sets node_type
+     * Sets security_group_name
      *
-     * @param string $node_type node_type
+     * @param string $security_group_name security_group_name
      *
      * @return $this
      */
-    public function setNodeType($node_type)
+    public function setSecurityGroupName($security_group_name)
     {
-        $this->container['node_type'] = $node_type;
-
-        return $this;
-    }
-
-    /**
-     * Gets sub_instance_type
-     *
-     * @return string
-     */
-    public function getSubInstanceType()
-    {
-        return $this->container['sub_instance_type'];
-    }
-
-    /**
-     * Sets sub_instance_type
-     *
-     * @param string $sub_instance_type sub_instance_type
-     *
-     * @return $this
-     */
-    public function setSubInstanceType($sub_instance_type)
-    {
-        $this->container['sub_instance_type'] = $sub_instance_type;
-
-        return $this;
-    }
-
-    /**
-     * Gets zone_id
-     *
-     * @return string
-     */
-    public function getZoneId()
-    {
-        return $this->container['zone_id'];
-    }
-
-    /**
-     * Sets zone_id
-     *
-     * @param string $zone_id zone_id
-     *
-     * @return $this
-     */
-    public function setZoneId($zone_id)
-    {
-        $this->container['zone_id'] = $zone_id;
-
-        return $this;
-    }
-
-    /**
-     * Gets v_cpu
-     *
-     * @return int
-     */
-    public function getVCpu()
-    {
-        return $this->container['v_cpu'];
-    }
-
-    /**
-     * Sets v_cpu
-     *
-     * @param int $v_cpu v_cpu
-     *
-     * @return $this
-     */
-    public function setVCpu($v_cpu)
-    {
-        $this->container['v_cpu'] = $v_cpu;
+        $this->container['security_group_name'] = $security_group_name;
 
         return $this;
     }

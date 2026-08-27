@@ -11,7 +11,7 @@ use ArrayAccess;
 use Byteplus\Common\ObjectSerializer;
 use Byteplus\Common\ModelInterface;
 
-class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, ArrayAccess
+class ModifyParameterTemplateResponse implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -20,7 +20,7 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
       *
       * @var string
       */
-    protected static $swaggerModelName = 'DatabasesPrivilegeForDescribeDatabasesOutput';
+    protected static $swaggerModelName = 'ModifyParameterTemplateResponse';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -28,9 +28,7 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'account_name' => 'string',
-        'account_privilege' => 'string',
-        'account_privilege_detail' => 'string'
+        'template_id' => 'string'
     ];
 
     /**
@@ -39,9 +37,7 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'account_name' => null,
-        'account_privilege' => null,
-        'account_privilege_detail' => null
+        'template_id' => null
     ];
 
     /**
@@ -71,9 +67,7 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
      * @var string[]
      */
     protected static $attributeMap = [
-        'account_name' => 'AccountName',
-        'account_privilege' => 'AccountPrivilege',
-        'account_privilege_detail' => 'AccountPrivilegeDetail'
+        'template_id' => 'TemplateId'
     ];
 
     /**
@@ -82,9 +76,7 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
      * @var string[]
      */
     protected static $setters = [
-        'account_name' => 'setAccountName',
-        'account_privilege' => 'setAccountPrivilege',
-        'account_privilege_detail' => 'setAccountPrivilegeDetail'
+        'template_id' => 'setTemplateId'
     ];
 
     /**
@@ -93,9 +85,7 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
      * @var string[]
      */
     protected static $getters = [
-        'account_name' => 'getAccountName',
-        'account_privilege' => 'getAccountPrivilege',
-        'account_privilege_detail' => 'getAccountPrivilegeDetail'
+        'template_id' => 'getTemplateId'
     ];
 
     /**
@@ -158,9 +148,7 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
      */
     public function __construct($data = null)
     {
-        $this->container['account_name'] = isset($data['account_name']) ? $data['account_name'] : null;
-        $this->container['account_privilege'] = isset($data['account_privilege']) ? $data['account_privilege'] : null;
-        $this->container['account_privilege_detail'] = isset($data['account_privilege_detail']) ? $data['account_privilege_detail'] : null;
+        $this->container['template_id'] = isset($data['template_id']) ? $data['template_id'] : null;
     }
 
     /**
@@ -188,73 +176,25 @@ class DatabasesPrivilegeForDescribeDatabasesOutput implements ModelInterface, Ar
 
 
     /**
-     * Gets account_name
+     * Gets template_id
      *
      * @return string
      */
-    public function getAccountName()
+    public function getTemplateId()
     {
-        return $this->container['account_name'];
+        return $this->container['template_id'];
     }
 
     /**
-     * Sets account_name
+     * Sets template_id
      *
-     * @param string $account_name account_name
+     * @param string $template_id template_id
      *
      * @return $this
      */
-    public function setAccountName($account_name)
+    public function setTemplateId($template_id)
     {
-        $this->container['account_name'] = $account_name;
-
-        return $this;
-    }
-
-    /**
-     * Gets account_privilege
-     *
-     * @return string
-     */
-    public function getAccountPrivilege()
-    {
-        return $this->container['account_privilege'];
-    }
-
-    /**
-     * Sets account_privilege
-     *
-     * @param string $account_privilege account_privilege
-     *
-     * @return $this
-     */
-    public function setAccountPrivilege($account_privilege)
-    {
-        $this->container['account_privilege'] = $account_privilege;
-
-        return $this;
-    }
-
-    /**
-     * Gets account_privilege_detail
-     *
-     * @return string
-     */
-    public function getAccountPrivilegeDetail()
-    {
-        return $this->container['account_privilege_detail'];
-    }
-
-    /**
-     * Sets account_privilege_detail
-     *
-     * @param string $account_privilege_detail account_privilege_detail
-     *
-     * @return $this
-     */
-    public function setAccountPrivilegeDetail($account_privilege_detail)
-    {
-        $this->container['account_privilege_detail'] = $account_privilege_detail;
+        $this->container['template_id'] = $template_id;
 
         return $this;
     }
