@@ -45,7 +45,7 @@ class DefaultEndpointProvider extends EndpointProvider
             'natgateway'     => new ServiceEndpointInfo('natgateway', false, true),
             'rds_mysql'      => new ServiceEndpointInfo('rds_mysql', false, true),
             'smc'            => new ServiceEndpointInfo('smc', true, false),
-            'iam'            => new ServiceEndpointInfo('iam', true, true),
+            'iam' => new ServiceEndpointInfo('iam', true, true),
             'vepfs'          => new ServiceEndpointInfo('vepfs', false, true),
             'kms'            => new ServiceEndpointInfo('kms', false, true),
             'ecs'            => new ServiceEndpointInfo('ecs', false, true),
