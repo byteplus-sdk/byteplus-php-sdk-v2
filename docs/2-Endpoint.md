@@ -12,6 +12,12 @@
 
 You can specify a custom endpoint when initializing the client:
 
+`setHost()` accepts a hostname (with an optional port) or an HTTP(S) origin URL.
+An explicit URL scheme overrides the configured scheme, and a trailing `/` is allowed.
+The request's `Host` header contains only the hostname and optional port, without the scheme or trailing `/`.
+Origin URLs containing user information, non-root paths, query parameters or fragments throw
+`InvalidArgumentException` before the request is sent. Supply resource paths and API parameters separately.
+
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
@@ -123,6 +129,82 @@ try {
 ```
 
 When you hit this error, first try upgrading the SDK. If the service is genuinely not carried by the SDK yet, set the endpoint explicitly via `Configuration::setHost(...)` or supply a custom endpoint provider.
+
+#### Standard Endpoint Provider
+
+`Byteplus\Common\Endpoint\Providers\StandardEndpointProvider` is an optional,
+template-driven resolver. Install it with `Configuration::setEndpointProvider()`;
+an explicit `host` still takes priority. It has its own built-in service table.
+
+Constructor: `new StandardEndpointProvider($fmt = null, $siteStack = null, $extension = null, $customServices = null)`.
+
+| Parameter | Behavior |
+|---|---|
+| `$fmt` | Defaults to `{Service}{Region}.{SiteStack}.com{CNSuffix}` |
+| `$siteStack` | Initial value only; `endpointFor()` overwrites it based on DualStack. For a custom domain, use literal template text or an extension key |
+| `$extension` | Array of additional template variables; non-arrays are ignored. Use string values and nonempty string keys without `{` or `}` |
+| `$customServices` | Array mapping service names to global/regional classifications; non-arrays are ignored |
+
+**Templates and variables**
+
+All three syntaxes can be mixed: `{Key}`, `${Key}`, and `{{.Key}}`. For example,
+`${Service}{{.Region}}.{SiteStack}.com{CNSuffix}` renders the same host as the
+default template. `{{.Key}}` is a placeholder syntax, not a full Go template engine.
+
+| Built-in variable | Value |
+|---|---|
+| `Service` | Lowercase service code with `_` replaced by `-` |
+| `Region` | `.<region>` for regional services, empty for global services; includes the leading dot |
+| `SiteStack` | `byteplusapi`, or `byteplus-api` when DualStack is enabled |
+| `CNSuffix` | `.cn` for a regional service in a validated `cn-*` region except exactly `cn-hongkong`; otherwise empty |
+| `Extension` | Legacy formatted string of extension key/value pairs; not JSON |
+
+Each extension key is also available directly, for example `{Tenant}`,
+`${Tenant}`, or `{{.Tenant}}`. Built-in values win on name collisions.
+Replacement values are emitted literally and are not scanned again.
+
+**Custom services and errors**
+
+Built-in service entries take priority over `$customServices`. For an unknown
+service, accepted custom entries include:
+
+- `['mysvc' => false]`: `false` is regional, `true` is global.
+- `['mysvc' => ['isGlobal' => false]]`: also accepts `IsGlobal`.
+- `['mysvc' => (object) ['IsGlobal' => true]]`: also accepts public `isGlobal`.
+  `new \Byteplus\Common\Endpoint\Providers\ServiceInfo('mysvc', true)` is supported.
+
+Errors are `StandProviderError`; read the symbolic error with `getStandCode()`,
+not the numeric `getCode()`: `InvalidArgument` for non-string/blank service or
+region, `InvalidRegion` for unsupported region syntax, `ServiceNotFound` for an
+unregistered service, `InvalidCustomService` for an unsupported entry, and
+`TemplateExecuteError` for an unknown placeholder. This is not full hostname
+validation: literal text and replacement values remain the caller's responsibility.
+
+DualStack uses an explicit `true`/`false` first; `null` reads
+`BYTEPLUS_ENABLE_DUALSTACK`. `customBootstrapRegion` has no effect.
+Unlike the default provider, Standard has no per-service `goChinaEnabled` flag;
+its `CNSuffix` follows the rule above.
+
+```php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+use Byteplus\Common\Configuration;
+use Byteplus\Common\Endpoint\Providers\StandardEndpointProvider;
+
+$provider = new StandardEndpointProvider(
+    '{Service}{Region}.{Tenant}.{SiteStack}.com{CNSuffix}',
+    null,
+    ['Tenant' => 'tenant-a'],
+    ['mysvc' => ['isGlobal' => false]]
+);
+$host = $provider->endpointFor('mysvc', 'ap-southeast-1', null, false)->host;
+// mysvc.ap-southeast-1.tenant-a.byteplusapi.com
+$config = (new Configuration())
+    ->setEndpointProvider($provider)
+    ->setRegion('ap-southeast-1')
+    ->setUseDualStack(false);
+```
 
 ---
 

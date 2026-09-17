@@ -127,56 +127,12 @@ class StsProvider extends Provider
             $this->schema . '://' . $this->host . '/' . ($query ? "?{$query}" : ''),
             $headers, '');
 
-        $client = new Client([
-            'timeout' => $this->timeout,
-            'connect_timeout' => $this->connectTimeout,
-            'verify' => true,
-            'http_errors' => false,
-        ]);
-        $lastException = null;
-        for ($attempt = 0; $attempt < $this->maxRetries; $attempt++) {
-            try {
-                $response = $client->send($request, [
-                    'timeout' => $this->timeout,
-                    'connect_timeout' => $this->connectTimeout,
-                ]);
-                $statusCode = $response->getStatusCode();
-                if ($statusCode >= 200 && $statusCode <= 299) {
-                    $lastException = null;
-                    break;
-                }
-
-                $lastException = new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)(%s)',
-                        $statusCode,
-                        $request->getUri(),
-                        $response->getBody()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-                if ($statusCode !== 429 && $statusCode < 500) {
-                    throw $lastException;
-                }
-            } catch (TransferException $e) {
-                $response = $e instanceof RequestException ? $e->getResponse() : null;
-                $lastException = new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    $e->getCode(),
-                    $response ? $response->getHeaders() : null,
-                    $response ? (string) $response->getBody() : null
-                );
-            }
-
-            if ($attempt < $this->maxRetries - 1) {
-                sleep($this->retryInterval);
-            }
+        $response = $this->sendWithRetry($request);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode < 200 || $statusCode > 299) {
+            throw $this->apiExceptionFromResponse($request, $response);
         }
-        if ($lastException !== null) {
-            throw $lastException;
-        }
+
         $responseContent = $response->getBody()->getContents();
         $content = json_decode($responseContent);
 
@@ -186,7 +142,7 @@ class StsProvider extends Provider
                     '[%d] Return Error From the API (%s)(%s)',
                     $statusCode,
                     $request->getUri(),
-                    $response->getBody()
+                    $responseContent
                 ),
                 $statusCode,
                 $response->getHeaders(),
@@ -262,6 +218,92 @@ class StsProvider extends Provider
         }
         $this->retryInterval = $retryInterval;
         return $this;
+    }
+
+    private function sendWithRetry(Request $request)
+    {
+        $client = new Client([
+            'timeout' => $this->timeout,
+            'connect_timeout' => $this->connectTimeout,
+            'verify' => true,
+            'http_errors' => false,
+        ]);
+        $lastException = null;
+
+        // $this->maxRetries carries total-attempt semantics here (see the
+        // constructor and setMaxRetries notes), so the last attempt index is
+        // maxRetries - 1.
+        for ($attempt = 0; $attempt < $this->maxRetries; $attempt++) {
+            try {
+                $response = $client->send($request, [
+                    'timeout' => $this->timeout,
+                    'connect_timeout' => $this->connectTimeout,
+                    'http_errors' => false,
+                ]);
+
+                if (!$this->isRetryableStatusCode($response->getStatusCode()) || $attempt >= $this->maxRetries - 1) {
+                    return $response;
+                }
+
+                $lastException = $this->apiExceptionFromResponse($request, $response);
+            } catch (RequestException $e) {
+                $lastException = $this->apiExceptionFromRequestException($e);
+                if (!$this->isRetryableRequestException($e) || $attempt >= $this->maxRetries - 1) {
+                    throw $lastException;
+                }
+            } catch (TransferException $e) {
+                $lastException = new ApiException("[{$e->getCode()}] {$e->getMessage()}", $e->getCode(), null, null);
+                if ($attempt >= $this->maxRetries - 1) {
+                    throw $lastException;
+                }
+            }
+
+            if ($attempt < $this->maxRetries - 1 && $this->retryInterval > 0) {
+                sleep($this->retryInterval);
+            }
+        }
+
+        throw $lastException;
+    }
+
+    private function isRetryableStatusCode($statusCode)
+    {
+        return in_array((int) $statusCode, [429, 500, 502, 503, 504], true);
+    }
+
+    private function isRetryableRequestException(RequestException $e)
+    {
+        $response = $e->getResponse();
+        if ($response === null) {
+            return true;
+        }
+        return $this->isRetryableStatusCode($response->getStatusCode());
+    }
+
+    private function apiExceptionFromRequestException(RequestException $e)
+    {
+        return new ApiException(
+            "[{$e->getCode()}] {$e->getMessage()}",
+            $e->getCode(),
+            $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+            $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+        );
+    }
+
+    private function apiExceptionFromResponse(Request $request, $response)
+    {
+        $body = (string) $response->getBody();
+        return new ApiException(
+            sprintf(
+                '[%d] Error connecting to the API (%s)(%s)',
+                $response->getStatusCode(),
+                $request->getUri(),
+                $body
+            ),
+            $response->getStatusCode(),
+            $response->getHeaders(),
+            $body
+        );
     }
 }
 

@@ -77,7 +77,40 @@ class SsoCredentialProvider extends Provider
         }
 
         if ($this->isTokenExpired($this->tokenCache)) {
-            $accessToken = $this->refreshAccessToken($this->tokenCache, $tokenPath, $region);
+            try {
+                $accessToken = $this->refreshAccessToken($this->tokenCache, $tokenPath, $region);
+            } catch (InvalidGrantApiException $e) {
+                // Fallback: a concurrent `bp sso login` or another SDK process may
+                // have rotated the cache under us. Reload the disk file once; if
+                // the disk refresh_token differs, retry the OAuth call exactly
+                // once with the disk state. Otherwise surface an actionable error.
+                $diskCache = $this->loadTokenCache($tokenPath);
+                $diskRT = isset($diskCache['refresh_token']) && is_string($diskCache['refresh_token'])
+                    ? trim($diskCache['refresh_token']) : '';
+                $memRT = isset($this->tokenCache['refresh_token']) && is_string($this->tokenCache['refresh_token'])
+                    ? trim($this->tokenCache['refresh_token']) : '';
+                if ($diskRT === '' || $diskRT === $memRT) {
+                    throw new ApiException(
+                        self::PROVIDER_NAME . ": sso refresh token was rejected and the disk cache holds no fresher token; please run 'bp sso login' to re-authenticate. underlying error: "
+                            . $e->getMessage()
+                    );
+                }
+                $diskAccessToken = isset($diskCache['access_token']) && is_string($diskCache['access_token'])
+                    ? trim($diskCache['access_token']) : '';
+                if ($diskAccessToken !== '' && !$this->isTokenExpired($diskCache)) {
+                    $this->tokenCache = $diskCache;
+                    return $this->getRoleCredentials($diskAccessToken, $region);
+                }
+                try {
+                    $accessToken = $this->refreshAccessToken($diskCache, $tokenPath, $region);
+                    $this->tokenCache = $diskCache;
+                } catch (InvalidGrantApiException $e2) {
+                    throw new ApiException(
+                        self::PROVIDER_NAME . ": sso refresh token rejected; reloaded disk cache but the new refresh token was also rejected; please run 'bp sso login' to re-authenticate. underlying error: "
+                            . $e2->getMessage()
+                    );
+                }
+            }
         }
 
         return $this->getRoleCredentials($accessToken, $region);
@@ -176,7 +209,7 @@ class SsoCredentialProvider extends Provider
         $payload = json_encode([
             'start_url' => $startURL,
             'session_name' => $sessionName,
-        ], JSON_UNESCAPED_SLASHES);
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         return sha1($payload) . '.json';
     }
 
@@ -210,7 +243,7 @@ class SsoCredentialProvider extends Provider
         $expiresAt = isset($tokenCache['expires_at']) && is_string($tokenCache['expires_at'])
             ? trim($tokenCache['expires_at']) : '';
         if ($expiresAt === '') {
-            return false;
+            return true;
         }
 
         $ts = strtotime($expiresAt);
@@ -220,7 +253,7 @@ class SsoCredentialProvider extends Provider
             );
         }
 
-        return time() > $ts;
+        return time() >= $ts;
     }
 
     private function refreshAccessToken(&$tokenCache, $tokenPath, $region)
@@ -235,8 +268,13 @@ class SsoCredentialProvider extends Provider
 
         // Check if refresh token (client_secret) is expired
         $clientSecretExpiresAt = isset($tokenCache['client_secret_expires_at']) ? (int) $tokenCache['client_secret_expires_at'] : 0;
-        if ($clientSecretExpiresAt > 0
-            && time() >= $this->unixTimestampToSeconds($clientSecretExpiresAt)) {
+        if ($clientSecretExpiresAt <= 0) {
+            throw new ApiException(
+                self::PROVIDER_NAME . ": refresh token expiration is missing in {$tokenPath}; please run 'bp sso login' to re-authenticate"
+            );
+        }
+        $refreshExpTime = $this->unixTimestampToSeconds($clientSecretExpiresAt);
+        if (time() >= $refreshExpTime) {
             throw new ApiException(
                 self::PROVIDER_NAME . ": refresh token in {$tokenPath} has expired; please run 'bp sso login' to re-authenticate"
             );
@@ -289,6 +327,8 @@ class SsoCredentialProvider extends Provider
             $tokenCache['refresh_token'] = $response['refresh_token'];
         }
         $tokenCache['expires_at'] = gmdate('Y-m-d\TH:i:s\Z', time() + $expiresIn);
+
+        $this->saveTokenCache($tokenPath, $tokenCache);
 
         return $newAccessToken;
     }
@@ -389,6 +429,17 @@ class SsoCredentialProvider extends Provider
         $statusCode = $response->getStatusCode();
         $responseBody = (string) $response->getBody();
 
+        if ($statusCode === 400) {
+            $decoded = json_decode($responseBody, true);
+            $err = is_array($decoded) && isset($decoded['error']) && is_string($decoded['error'])
+                ? $decoded['error'] : '';
+            if ($err === 'invalid_grant') {
+                throw new InvalidGrantApiException(
+                    'sso refresh_token rejected (invalid_grant): ' . $responseBody
+                );
+            }
+        }
+
         if ($statusCode < 200 || $statusCode >= 300) {
             throw new ApiException(
                 self::PROVIDER_NAME . ': HTTP POST request failed with status ' . $statusCode
@@ -450,6 +501,41 @@ class SsoCredentialProvider extends Provider
             }
         }
         throw $lastError;
+    }
+
+    private function saveTokenCache($tokenPath, $tokenCache)
+    {
+        $dir = dirname($tokenPath);
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0700, true);
+        }
+
+        $json = json_encode($tokenCache, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($json === false) {
+            // SSO refresh contract requires the disk write to succeed so other PHP
+            // processes can reuse the rotated token; throw loudly here, unlike the
+            // console-login provider which can silently fall back to in-memory
+            // credentials and let the next process re-refresh.
+            throw new ApiException(
+                self::PROVIDER_NAME . ": failed to encode sso token cache for {$tokenPath}"
+            );
+        }
+        $tmpFile = $tokenPath . '.tmp.' . getmypid();
+
+        if (@file_put_contents($tmpFile, $json) === false) {
+            throw new ApiException(
+                self::PROVIDER_NAME . ": failed to write sso token cache file {$tokenPath}"
+            );
+        }
+
+        @chmod($tmpFile, 0600);
+
+        if (!@rename($tmpFile, $tokenPath)) {
+            @unlink($tmpFile);
+            throw new ApiException(
+                self::PROVIDER_NAME . ": failed to update sso token cache file {$tokenPath}"
+            );
+        }
     }
 
     /**

@@ -130,6 +130,10 @@ $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
 
 AssumeRole provides dynamic credentials. `StsProvider::getCredentials()` caches the returned credentials and refreshes them 60 seconds before `ExpiredTime`. It validates the required STS fields and retries transient failures. The default endpoint and signing region are `sts.ap-southeast-1.byteplusapi.com` and `ap-southeast-1`.
 
+For `StsProvider`, retryable HTTP statuses are exactly `429/500/502/503/504`;
+other HTTP statuses, including `501/505/599`, do not trigger status-based retries.
+Network/transport exceptions without a response can also be retried.
+
 > ⚠️ **Notes**
 >
 > 1. Least privilege.
@@ -309,18 +313,26 @@ $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
 
 #### Runtime Refresh Behavior (sso / console-login)
 
-For `sso` and `console-login` modes the SDK refreshes expired access tokens and
-keeps the refreshed state in the current PHP process, matching the Python SDK:
+For `sso` and `console-login` modes, the SDK refreshes access tokens when the
+provider's expiry condition is met and retains the refreshed state in memory:
 
-- **Per-object in-memory cache**: a single `CLIConfigCredentialProvider` instance
-  caches the parsed credentials for the lifetime of the object (within a single
-  PHP request), so repeated API calls inside one request reuse the same STS.
-- **CLI-owned disk cache**: the SDK never writes the SSO or console-login cache;
-  `bp login` / `bp sso login` remain the sole disk-cache writers.
-- **Console-login rotation recovery**: on HTTP 400 `invalid_grant`, the
-  console-login provider reloads the disk cache once and retries only when it
-  finds a different refresh token. SSO surfaces the refresh failure directly,
-  matching Python behavior.
+- **Per-object in-memory cache**: repeated calls on the same provider reuse
+  credentials while they remain within its validity window.
+- **Shared disk cache**: both the PHP SDK and `bp login` / `bp sso login` write
+  the cache. The SDK writes a temporary file, attempts to set permissions to
+  `0600`, then updates the cache using atomic `rename` on supported filesystems.
+  SSO reports encoding/write/rename failures as exceptions; console-login
+  persistence is best-effort and does not abort credential retrieval on these
+  failures. A failed write does not guarantee persistence for the next process.
+- **SSO rotation recovery**: on HTTP 400 `invalid_grant`, the provider reloads
+  the disk cache once. Recovery requires a nonempty disk refresh token that
+  differs from the in-memory token. It then reuses a nonempty, unexpired disk
+  access token, or makes one further OAuth refresh call. There are at most two
+  OAuth refresh requests in this recovery flow. An unchanged/empty disk refresh
+  token or another `invalid_grant` produces a `bp sso login` error.
+- **Console-login rotation recovery**: on HTTP 400 `invalid_grant`, the provider
+  also reloads the disk cache once and requires a different, nonempty refresh
+  token. It reuses valid cached credentials or attempts one further refresh.
 - **Actionable error messages**: every error path that requires
   re-authentication contains `'bp login'` (console-login) or `'bp sso login'`
   (sso) so the caller can present a clear next step.
