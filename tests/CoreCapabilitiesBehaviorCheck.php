@@ -49,9 +49,10 @@ function run_static_credential_check()
 function run_configuration_check()
 {
     $configuration = new Configuration();
+    $defaultUserAgent = $configuration->getUserAgent();
     $configuration->setUserAgent('core-check/1.0');
     core_assert_same(
-        'byteplus-php-sdk-v2/1.0.3 core-check/1.0',
+        $defaultUserAgent . ' core-check/1.0',
         $configuration->getUserAgent(),
         'user agent prefix'
     );

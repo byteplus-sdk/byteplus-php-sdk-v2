@@ -97,8 +97,8 @@ class StandardEndpointProvider extends EndpointProvider
         $this->fmt = $fmt ?: self::DEFAULT_FORMAT;
         $this->variables = new StandardEndpointResolverVariable();
         $this->variables->siteStack = $siteStack ?: self::SITE_STACK_BYTEPLUS_IPV4;
-        $this->variables->extension = $extension ?: [];
-        $this->customServices = $customServices ?: [];
+        $this->variables->extension = is_array($extension) ? $extension : [];
+        $this->customServices = is_array($customServices) ? $customServices : [];
     }
 
     private static function serviceInfos()
@@ -333,35 +333,39 @@ class StandardEndpointProvider extends EndpointProvider
 
     private function renderTemplate($fmt)
     {
-        $values = [
+        // Base variables, plus every extension key promoted to a first-class
+        // placeholder (GAP-E3) so custom formats can reference arbitrary
+        // extension values. The {Extension} blob token is kept for backward
+        // compatibility; explicit base variables win over same-named extension
+        // keys.
+        $values = array_merge($this->variables->extension, [
             'Service' => $this->variables->service,
             'Region' => $this->variables->region,
             'SiteStack' => $this->variables->siteStack,
             'CNSuffix' => $this->variables->cnSuffix,
             'Extension' => self::formatExtension($this->variables->extension),
-        ];
+        ]);
 
-        if (preg_match_all('/\{([^{}]+)\}/', $fmt, $matches)) {
-            foreach ($matches[1] as $key) {
-                if (!array_key_exists($key, $values)) {
-                    throw new StandProviderError(
-                        'TemplateExecuteError',
-                        'failed to execute template for format ' . $fmt . ', missing variable ' . $key
-                    );
-                }
+        $format = $fmt ?: self::DEFAULT_FORMAT;
+        // Match complete placeholders once; never re-parse substituted values.
+        $pattern = '/\{\{\.([^{}]+)\}\}|\$\{([^{}]+)\}|\{([^{}]+)\}/';
+        return preg_replace_callback($pattern, function ($matches) use ($values, $format) {
+            $key = $matches[count($matches) - 1];
+            if (!array_key_exists($key, $values)) {
+                throw new StandProviderError(
+                    'TemplateExecuteError',
+                    'failed to execute template for format ' . $format . ', missing variable ' . $key
+                );
             }
-        }
-
-        $replacements = [];
-        foreach ($values as $key => $value) {
-            $replacements['{' . $key . '}'] = $value;
-        }
-
-        return strtr($fmt, $replacements);
+            return $values[$key];
+        }, $format);
     }
 
     public function endpointFor($service, $region, $customBootstrapRegion = null, $useDualStack = null)
     {
+        self::checkNonEmpty('service', $service);
+        self::checkNonEmpty('region', $region);
+
         if (!self::regionMatcher()->validate($region)) {
             throw new StandProviderError(
                 'InvalidRegion',
@@ -374,38 +378,99 @@ class StandardEndpointProvider extends EndpointProvider
         $this->variables->cnSuffix = '';
         $this->variables->service = self::standardizeDomainServiceCode($service);
 
-        $serviceInfos = self::serviceInfos();
-        $svcInfo = null;
-        if (array_key_exists($service, $serviceInfos)) {
-            $svcInfo = $serviceInfos[$service];
-        } elseif (is_array($this->customServices) && array_key_exists($service, $this->customServices)) {
-            $svcInfo = $this->customServices[$service];
-        }
+        $isGlobal = $this->resolveServiceIsGlobal($service);
 
-        if (!$svcInfo) {
-            throw new StandProviderError(
-                'ServiceNotFound',
-                'service ' . $service . ' not found in ServiceInfos or customServices , please upgrade the sdk endpoint resolver to the latest version'
-            );
-        }
-
-        if (!$svcInfo->IsGlobal) {
+        if (!$isGlobal) {
             $this->variables->region = '.' . $region;
         } else {
             $this->variables->region = '';
         }
 
-        if ($useDualStack) {
+        if (self::hasEnabledDualstack($useDualStack)) {
             $this->variables->siteStack = self::SITE_STACK_BYTEPLUS_DUAL_STACK;
         } else {
             $this->variables->siteStack = self::SITE_STACK_BYTEPLUS_IPV4;
         }
 
-        if (!$svcInfo->IsGlobal && self::isGoChina($region)) {
+        if (!$isGlobal && self::isGoChina($region)) {
             $this->variables->cnSuffix = self::CN_SUFFIX;
         }
 
         return new ResolvedEndpoint($this->renderTemplate($fmt));
+    }
+
+    /**
+     * hasEnabledDualstack mirrors DefaultEndpointProvider: when the caller did
+     * not pass an explicit flag, fall back to the BYTEPLUS_ENABLE_DUALSTACK
+     * environment variable so both providers behave the same (GAP-E1).
+     */
+    private static function hasEnabledDualstack($useDualStack)
+    {
+        if ($useDualStack === null) {
+            return getenv('BYTEPLUS_ENABLE_DUALSTACK') == 'true';
+        }
+        return $useDualStack;
+    }
+
+    /**
+     * resolveServiceIsGlobal looks the service up in the built-in table first,
+     * then in customServices. Returns the IsGlobal boolean or throws when the
+     * service is registered nowhere.
+     */
+    private function resolveServiceIsGlobal($service)
+    {
+        $serviceInfos = self::serviceInfos();
+        if (array_key_exists($service, $serviceInfos)) {
+            return (bool) $serviceInfos[$service]->IsGlobal;
+        }
+        if (is_array($this->customServices) && array_key_exists($service, $this->customServices)) {
+            return $this->normalizeCustomService($this->customServices[$service]);
+        }
+
+        throw new StandProviderError(
+            'ServiceNotFound',
+            'service ' . $service . ' not found in ServiceInfos or customServices , please upgrade the sdk endpoint resolver to the latest version'
+        );
+    }
+
+    /**
+     * normalizeCustomService accepts the multiple shapes a custom service entry
+     * can take (GAP-E4): a bare bool, an array with isGlobal/IsGlobal, an object
+     * exposing isGlobal/IsGlobal (including {@see ServiceInfo}). Returns the
+     * IsGlobal boolean or throws when the shape is not understood.
+     */
+    private function normalizeCustomService($serviceInfo)
+    {
+        if (is_bool($serviceInfo)) {
+            return $serviceInfo;
+        }
+        if (is_array($serviceInfo) && isset($serviceInfo['isGlobal'])) {
+            return (bool) $serviceInfo['isGlobal'];
+        }
+        if (is_array($serviceInfo) && isset($serviceInfo['IsGlobal'])) {
+            return (bool) $serviceInfo['IsGlobal'];
+        }
+        if (is_object($serviceInfo) && isset($serviceInfo->isGlobal)) {
+            return (bool) $serviceInfo->isGlobal;
+        }
+        if (is_object($serviceInfo) && isset($serviceInfo->IsGlobal)) {
+            return (bool) $serviceInfo->IsGlobal;
+        }
+
+        throw new StandProviderError(
+            'InvalidCustomService',
+            'custom service must define isGlobal'
+        );
+    }
+
+    private static function checkNonEmpty($name, $value)
+    {
+        if (!is_string($value) || trim($value) === '') {
+            throw new StandProviderError(
+                'InvalidArgument',
+                $name . ' must not be empty'
+            );
+        }
     }
 }
 

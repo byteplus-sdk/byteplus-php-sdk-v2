@@ -12,6 +12,10 @@
 
 用户可以通过在初始化客户端时指定 Endpoint：
 
+`setHost()` 支持域名（可带端口）或 HTTP(S) 源站 URL。URL 显式协议优先于配置中的协议，允许尾部 `/`；
+请求的 `Host` 头只包含域名和可选端口，不包含协议或尾部 `/`。
+源站 URL 中的用户信息、非根路径、查询参数和片段会在发送请求前抛出 `InvalidArgumentException`，资源路径和 API 参数应单独传入。
+
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
@@ -126,6 +130,69 @@ try {
 ```
 
 遇到该错误时，建议先升级 SDK 版本；若确认 SDK 尚未内置该服务的寻址元数据，可通过 `Configuration::setHost(...)` 或自定义 Endpoint Provider 显式指定。
+
+#### Standard Endpoint Provider
+
+`Byteplus\Common\Endpoint\Providers\StandardEndpointProvider` 是可选的模板寻址器，通过 `Configuration::setEndpointProvider()` 配置；显式 `host` 仍有最高优先级。它使用独立的内置服务表。
+
+构造方法：`new StandardEndpointProvider($fmt = null, $siteStack = null, $extension = null, $customServices = null)`。
+
+| 参数 | 行为 |
+|---|---|
+| `$fmt` | 默认 `{Service}{Region}.{SiteStack}.com{CNSuffix}` |
+| `$siteStack` | 仅初始化变量，`endpointFor()` 会按 DualStack 覆盖；自定义域名应使用模板字面量或扩展键 |
+| `$extension` | 额外模板变量数组，非数组会被忽略；使用字符串值，以及不含 `{`、`}` 的非空字符串键 |
+| `$customServices` | 服务名到全局/区域级分类的映射数组，非数组会被忽略 |
+
+**模板与变量**
+
+支持混用 `{Key}`、`${Key}`、`{{.Key}}`。例如 `${Service}{{.Region}}.{SiteStack}.com{CNSuffix}` 与默认模板输出相同。`{{.Key}}` 只是占位符语法，不提供完整的 Go 模板引擎。
+
+| 内置变量 | 值 |
+|---|---|
+| `Service` | 服务代码转小写，`_` 替换为 `-` |
+| `Region` | 区域级服务为 `.<region>`，全局服务为空；包含前导点 |
+| `SiteStack` | `byteplusapi`，启用 DualStack 时为 `byteplus-api` |
+| `CNSuffix` | 区域级服务、region 通过校验且以 `cn-` 开头、并非精确值 `cn-hongkong` 时为 `.cn`，否则为空 |
+| `Extension` | 保留的扩展键值格式化字符串，不是 JSON |
+
+每个扩展键也可直接作为占位符，例如 `{Tenant}`、`${Tenant}`、`{{.Tenant}}`。同名时内置变量优先。替换值按字面输出，不再进行二次扫描。
+
+**自定义服务与错误**
+
+内置服务条目优先于 `$customServices`。内置表之外的服务支持以下形态：
+
+- `['mysvc' => false]`：`false` 表示区域级，`true` 表示全局。
+- `['mysvc' => ['isGlobal' => false]]`：也支持 `IsGlobal` 键。
+- `['mysvc' => (object) ['IsGlobal' => true]]`：也支持公开的 `isGlobal` 属性；还支持 `new \Byteplus\Common\Endpoint\Providers\ServiceInfo('mysvc', true)`。
+
+异常类型为 `StandProviderError`，通过 `getStandCode()` 获取符号错误码，而非数值 `getCode()`：
+service 或 region 非字符串/纯空白时报 `InvalidArgument`；region 格式不支持时报 `InvalidRegion`；服务未注册时报 `ServiceNotFound`；自定义条目形态不支持时报 `InvalidCustomService`；占位符不存在时报 `TemplateExecuteError`。
+这不是完整的域名合法性校验，调用方仍须保证模板字面量和替换值适合作为域名。
+
+DualStack 优先使用显式 `true`/`false`，`null` 时读取 `BYTEPLUS_ENABLE_DUALSTACK`。`customBootstrapRegion` 不参与寻址。
+与默认 Provider 不同，Standard 没有服务级 `goChinaEnabled` 标志，`CNSuffix` 采用上表规则。
+
+```php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+use Byteplus\Common\Configuration;
+use Byteplus\Common\Endpoint\Providers\StandardEndpointProvider;
+
+$provider = new StandardEndpointProvider(
+    '{Service}{Region}.{Tenant}.{SiteStack}.com{CNSuffix}',
+    null,
+    ['Tenant' => 'tenant-a'],
+    ['mysvc' => ['isGlobal' => false]]
+);
+$host = $provider->endpointFor('mysvc', 'ap-southeast-1', null, false)->host;
+// mysvc.ap-southeast-1.tenant-a.byteplusapi.com
+$config = (new Configuration())
+    ->setEndpointProvider($provider)
+    ->setRegion('ap-southeast-1')
+    ->setUseDualStack(false);
+```
 
 ---
 

@@ -35,15 +35,29 @@ class ResolveEndpointInterceptor extends Interceptor
             $context->request->host = $endpointResolver->host;
             $prefix = $endpointResolver->urlFor($schema);
         } else {
-            if (strpos($host, 'https://') === 0) {
-                $prefix = $host;
-                $context->request->host = substr($host, strlen('https://'));
-            } elseif (strpos($host, 'http://') === 0) {
-                $prefix = $host;
-                $context->request->host = substr($host, strlen('http://'));
-            } else {
-                $prefix = $schema . '://' . $host;
+            if (preg_match('/^https?:\/\//i', $host)) {
+                $parts = parse_url($host);
+                if ($parts === false || empty($parts['host'])
+                    || isset($parts['user']) || isset($parts['pass'])
+                    || isset($parts['query']) || isset($parts['fragment'])
+                    || (isset($parts['path']) && $parts['path'] !== '' && $parts['path'] !== '/')) {
+                    throw new \InvalidArgumentException(
+                        'endpoint URL must contain only an HTTP(S) scheme, host and optional port'
+                    );
+                }
+                $schema = strtolower($parts['scheme']);
+                $host = $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '');
+                $context->request->schema = $schema;
+                $context->request->host = $host;
+                // Preserve the explicit URL's authority through signing and retries.
+                foreach (array_keys($context->request->headers) as $key) {
+                    if (strcasecmp($key, 'Host') === 0) {
+                        unset($context->request->headers[$key]);
+                    }
+                }
+                $context->request->headers['Host'] = $host;
             }
+            $prefix = $schema . '://' . $host;
         }
 
         LogHelper::debug($context->request->logger, $context->request->logLevel, SdkLogger::LOG_ENDPOINT,

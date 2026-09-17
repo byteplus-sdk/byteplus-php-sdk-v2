@@ -132,6 +132,8 @@ $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
 
 动态访问凭证信息。`StsProvider::getCredentials()` 会缓存 STS `AssumeRole` 返回的凭证，并在 `ExpiredTime` 前 60 秒刷新，同时校验必需字段并对临时失败进行重试。默认 endpoint 为 `sts.ap-southeast-1.byteplusapi.com`，签名 region 为 `ap-southeast-1`。
 
+`StsProvider` 的 HTTP 状态码重试集合仅为 `429/500/502/503/504`，其他状态码（包括 `501/505/599`）不会触发状态码重试；没有响应的网络/传输异常也可重试。
+
 > ⚠️ **注意事项**
 >
 > 1. 最小权限：仅授予调用方访问所需资源的最小权限，避免使用 * 通配符授予全资源、全操作权限。
@@ -321,11 +323,12 @@ $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
 
 #### 运行时刷新行为（sso / console-login）
 
-`sso` 与 `console-login` 模式下，SDK 会自动续期已过期的 access token，并在当前 PHP 进程中维护刷新后的状态，行为与 Python SDK 一致：
+`sso` 与 `console-login` 模式下，SDK 在满足对应 Provider 的过期判定条件时刷新 access token，并在内存中维护刷新后的状态：
 
-- **对象级内存缓存**：单个 `CLIConfigCredentialProvider` 实例会在对象生命周期内（同一次 PHP 请求中）缓存已解析的凭证，同一请求内多次调用 API 复用同一份 STS。
-- **CLI 独占磁盘写入**：SDK 不会写回 SSO 或 console-login 缓存，磁盘缓存仅由 `bp login` / `bp sso login` 更新。
-- **Console-login 轮换恢复**：服务端返回 HTTP 400 `invalid_grant` 时，console-login provider 会重新读取一次磁盘缓存；只有发现不同的 refresh token 才会重试。SSO 会直接暴露刷新失败，与 Python 行为一致。
+- **对象级内存缓存**：重复调用同一个 Provider 时，在其凭证有效窗口内复用缓存。
+- **共享磁盘缓存**：PHP SDK 与 `bp login` / `bp sso login` 共同写入缓存。SDK 先写临时文件，尝试设置 `0600` 权限，再通过支持原子替换的文件系统上的 `rename` 更新缓存。SSO 的编码、写入或 rename 失败会抛出异常；console-login 持久化为 best-effort，这些失败不会中止凭证获取。写入失败时不保证下一进程能复用本次刷新结果。
+- **SSO 轮换恢复**：收到 HTTP 400 `invalid_grant` 后只重读磁盘一次。恢复的前提是磁盘 refresh token 非空且与内存值不同；满足后，优先使用磁盘上非空且未过期的 access token，否则再调用一次 OAuth 刷新。该恢复流程最多发出两次 OAuth 刷新请求。磁盘 refresh token 未变化或为空、或再次收到 `invalid_grant` 时，返回包含 `bp sso login` 的错误提示。
+- **Console-login 轮换恢复**：收到 HTTP 400 `invalid_grant` 后也只重读磁盘一次，要求磁盘 refresh token 非空且已变化；随后复用有效的缓存凭证，或再尝试一次刷新。
 - **可操作的错误信息**：所有需要重新登录的错误路径都包含 `'bp login'`（console-login）或 `'bp sso login'`（sso），便于调用方向用户清晰说明下一步。
 
 ### ECS 角色凭证提供者
