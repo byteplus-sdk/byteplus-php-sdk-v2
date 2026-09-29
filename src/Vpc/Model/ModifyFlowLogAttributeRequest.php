@@ -33,7 +33,8 @@ class ModifyFlowLogAttributeRequest implements ModelInterface, ArrayAccess
         'description' => 'string',
         'flow_log_id' => 'string',
         'flow_log_name' => 'string',
-        'traffic_path' => 'int[]'
+        'flow_log_version' => 'int',
+        'traffic_path' => 'string[]'
     ];
 
     /**
@@ -47,6 +48,7 @@ class ModifyFlowLogAttributeRequest implements ModelInterface, ArrayAccess
         'description' => null,
         'flow_log_id' => null,
         'flow_log_name' => null,
+        'flow_log_version' => null,
         'traffic_path' => null
     ];
 
@@ -82,6 +84,7 @@ class ModifyFlowLogAttributeRequest implements ModelInterface, ArrayAccess
         'description' => 'Description',
         'flow_log_id' => 'FlowLogId',
         'flow_log_name' => 'FlowLogName',
+        'flow_log_version' => 'FlowLogVersion',
         'traffic_path' => 'TrafficPath'
     ];
 
@@ -96,6 +99,7 @@ class ModifyFlowLogAttributeRequest implements ModelInterface, ArrayAccess
         'description' => 'setDescription',
         'flow_log_id' => 'setFlowLogId',
         'flow_log_name' => 'setFlowLogName',
+        'flow_log_version' => 'setFlowLogVersion',
         'traffic_path' => 'setTrafficPath'
     ];
 
@@ -110,6 +114,7 @@ class ModifyFlowLogAttributeRequest implements ModelInterface, ArrayAccess
         'description' => 'getDescription',
         'flow_log_id' => 'getFlowLogId',
         'flow_log_name' => 'getFlowLogName',
+        'flow_log_version' => 'getFlowLogVersion',
         'traffic_path' => 'getTrafficPath'
     ];
 
@@ -178,6 +183,7 @@ class ModifyFlowLogAttributeRequest implements ModelInterface, ArrayAccess
         $this->container['description'] = isset($data['description']) ? $data['description'] : null;
         $this->container['flow_log_id'] = isset($data['flow_log_id']) ? $data['flow_log_id'] : null;
         $this->container['flow_log_name'] = isset($data['flow_log_name']) ? $data['flow_log_name'] : null;
+        $this->container['flow_log_version'] = isset($data['flow_log_version']) ? $data['flow_log_version'] : null;
         $this->container['traffic_path'] = isset($data['traffic_path']) ? $data['traffic_path'] : null;
     }
 
@@ -329,9 +335,33 @@ class ModifyFlowLogAttributeRequest implements ModelInterface, ArrayAccess
     }
 
     /**
+     * Gets flow_log_version
+     *
+     * @return int
+     */
+    public function getFlowLogVersion()
+    {
+        return $this->container['flow_log_version'];
+    }
+
+    /**
+     * Sets flow_log_version
+     *
+     * @param int $flow_log_version flow_log_version
+     *
+     * @return $this
+     */
+    public function setFlowLogVersion($flow_log_version)
+    {
+        $this->container['flow_log_version'] = $flow_log_version;
+
+        return $this;
+    }
+
+    /**
      * Gets traffic_path
      *
-     * @return int[]
+     * @return string[]
      */
     public function getTrafficPath()
     {
@@ -341,7 +371,7 @@ class ModifyFlowLogAttributeRequest implements ModelInterface, ArrayAccess
     /**
      * Sets traffic_path
      *
-     * @param int[] $traffic_path traffic_path
+     * @param string[] $traffic_path traffic_path
      *
      * @return $this
      */
