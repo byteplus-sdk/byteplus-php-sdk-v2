@@ -32,7 +32,7 @@ class DefaultEndpointProvider extends EndpointProvider
         }
 
         self::$defaultEndpoint = [
-            'vpc'            => new ServiceEndpointInfo('vpc', false, true),
+            'vpc' => new ServiceEndpointInfo('vpc', false, true),
             'vke'            => new ServiceEndpointInfo('vke', false, true),
             'auto_scaling'   => new ServiceEndpointInfo('auto_scaling', false, true),
             'storage_ebs'    => new ServiceEndpointInfo('storage_ebs', false, true),

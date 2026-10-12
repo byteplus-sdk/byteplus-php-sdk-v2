@@ -626,6 +626,68 @@ class VPCApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function associateIpamResourceDiscovery($body = null)
+    {
+        list($response) = $this->associateIpamResourceDiscoveryWithHttpInfo($body);
+        return $response;
+    }
+
+    public function associateIpamResourceDiscoveryWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\AssociateIpamResourceDiscoveryResponse';
+        $request = $this->associateIpamResourceDiscoveryRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function associateIpamResourceDiscoveryAsync($body = null)
+    {
+        return $this->associateIpamResourceDiscoveryAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function associateIpamResourceDiscoveryAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\AssociateIpamResourceDiscoveryResponse';
+        $request = $this->associateIpamResourceDiscoveryRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function associateIpamResourceDiscoveryRequest($body)
+    {
+        $resourcePath = '/AssociateIpamResourceDiscovery/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function associateNetworkAcl($body = null)
     {
         list($response) = $this->associateNetworkAclWithHttpInfo($body);
@@ -874,6 +936,68 @@ class VPCApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function attachIpv4Gateway($body = null)
+    {
+        list($response) = $this->attachIpv4GatewayWithHttpInfo($body);
+        return $response;
+    }
+
+    public function attachIpv4GatewayWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\AttachIpv4GatewayResponse';
+        $request = $this->attachIpv4GatewayRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function attachIpv4GatewayAsync($body = null)
+    {
+        return $this->attachIpv4GatewayAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function attachIpv4GatewayAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\AttachIpv4GatewayResponse';
+        $request = $this->attachIpv4GatewayRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function attachIpv4GatewayRequest($body)
+    {
+        $resourcePath = '/AttachIpv4Gateway/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function attachNetworkInterface($body = null)
     {
         list($response) = $this->attachNetworkInterfaceWithHttpInfo($body);
@@ -998,6 +1122,68 @@ class VPCApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function authorizeSecurityGroupEgressBatch($body = null)
+    {
+        list($response) = $this->authorizeSecurityGroupEgressBatchWithHttpInfo($body);
+        return $response;
+    }
+
+    public function authorizeSecurityGroupEgressBatchWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\AuthorizeSecurityGroupEgressBatchResponse';
+        $request = $this->authorizeSecurityGroupEgressBatchRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function authorizeSecurityGroupEgressBatchAsync($body = null)
+    {
+        return $this->authorizeSecurityGroupEgressBatchAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function authorizeSecurityGroupEgressBatchAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\AuthorizeSecurityGroupEgressBatchResponse';
+        $request = $this->authorizeSecurityGroupEgressBatchRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function authorizeSecurityGroupEgressBatchRequest($body)
+    {
+        $resourcePath = '/AuthorizeSecurityGroupEgressBatch/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function authorizeSecurityGroupIngress($body = null)
     {
         list($response) = $this->authorizeSecurityGroupIngressWithHttpInfo($body);
@@ -1032,6 +1218,68 @@ class VPCApi
     protected function authorizeSecurityGroupIngressRequest($body)
     {
         $resourcePath = '/AuthorizeSecurityGroupIngress/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function authorizeSecurityGroupIngressBatch($body = null)
+    {
+        list($response) = $this->authorizeSecurityGroupIngressBatchWithHttpInfo($body);
+        return $response;
+    }
+
+    public function authorizeSecurityGroupIngressBatchWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\AuthorizeSecurityGroupIngressBatchResponse';
+        $request = $this->authorizeSecurityGroupIngressBatchRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function authorizeSecurityGroupIngressBatchAsync($body = null)
+    {
+        return $this->authorizeSecurityGroupIngressBatchAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function authorizeSecurityGroupIngressBatchAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\AuthorizeSecurityGroupIngressBatchResponse';
+        $request = $this->authorizeSecurityGroupIngressBatchRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function authorizeSecurityGroupIngressBatchRequest($body)
+    {
+        $resourcePath = '/AuthorizeSecurityGroupIngressBatch/2020-04-01/vpc/get/text_plain/';
         $queryParams = [];
         $httpBody = $body;
 
@@ -1618,6 +1866,130 @@ class VPCApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function createIpamPoolAllocation($body = null)
+    {
+        list($response) = $this->createIpamPoolAllocationWithHttpInfo($body);
+        return $response;
+    }
+
+    public function createIpamPoolAllocationWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\CreateIpamPoolAllocationResponse';
+        $request = $this->createIpamPoolAllocationRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function createIpamPoolAllocationAsync($body = null)
+    {
+        return $this->createIpamPoolAllocationAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function createIpamPoolAllocationAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\CreateIpamPoolAllocationResponse';
+        $request = $this->createIpamPoolAllocationRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function createIpamPoolAllocationRequest($body)
+    {
+        $resourcePath = '/CreateIpamPoolAllocation/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function createIpamResourceDiscovery($body = null)
+    {
+        list($response) = $this->createIpamResourceDiscoveryWithHttpInfo($body);
+        return $response;
+    }
+
+    public function createIpamResourceDiscoveryWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\CreateIpamResourceDiscoveryResponse';
+        $request = $this->createIpamResourceDiscoveryRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function createIpamResourceDiscoveryAsync($body = null)
+    {
+        return $this->createIpamResourceDiscoveryAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function createIpamResourceDiscoveryAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\CreateIpamResourceDiscoveryResponse';
+        $request = $this->createIpamResourceDiscoveryRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function createIpamResourceDiscoveryRequest($body)
+    {
+        $resourcePath = '/CreateIpamResourceDiscovery/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function createIpamScope($body = null)
     {
         list($response) = $this->createIpamScopeWithHttpInfo($body);
@@ -1652,6 +2024,68 @@ class VPCApi
     protected function createIpamScopeRequest($body)
     {
         $resourcePath = '/CreateIpamScope/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function createIpv4Gateway($body = null)
+    {
+        list($response) = $this->createIpv4GatewayWithHttpInfo($body);
+        return $response;
+    }
+
+    public function createIpv4GatewayWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\CreateIpv4GatewayResponse';
+        $request = $this->createIpv4GatewayRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function createIpv4GatewayAsync($body = null)
+    {
+        return $this->createIpv4GatewayAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function createIpv4GatewayAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\CreateIpv4GatewayResponse';
+        $request = $this->createIpv4GatewayRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function createIpv4GatewayRequest($body)
+    {
+        $resourcePath = '/CreateIpv4Gateway/2020-04-01/vpc/get/text_plain/';
         $queryParams = [];
         $httpBody = $body;
 
@@ -3106,6 +3540,68 @@ class VPCApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function deleteIpamResourceDiscovery($body = null)
+    {
+        list($response) = $this->deleteIpamResourceDiscoveryWithHttpInfo($body);
+        return $response;
+    }
+
+    public function deleteIpamResourceDiscoveryWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DeleteIpamResourceDiscoveryResponse';
+        $request = $this->deleteIpamResourceDiscoveryRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function deleteIpamResourceDiscoveryAsync($body = null)
+    {
+        return $this->deleteIpamResourceDiscoveryAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function deleteIpamResourceDiscoveryAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DeleteIpamResourceDiscoveryResponse';
+        $request = $this->deleteIpamResourceDiscoveryRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function deleteIpamResourceDiscoveryRequest($body)
+    {
+        $resourcePath = '/DeleteIpamResourceDiscovery/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function deleteIpamScope($body = null)
     {
         list($response) = $this->deleteIpamScopeWithHttpInfo($body);
@@ -3140,6 +3636,68 @@ class VPCApi
     protected function deleteIpamScopeRequest($body)
     {
         $resourcePath = '/DeleteIpamScope/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function deleteIpv4Gateway($body = null)
+    {
+        list($response) = $this->deleteIpv4GatewayWithHttpInfo($body);
+        return $response;
+    }
+
+    public function deleteIpv4GatewayWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DeleteIpv4GatewayResponse';
+        $request = $this->deleteIpv4GatewayRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function deleteIpv4GatewayAsync($body = null)
+    {
+        return $this->deleteIpv4GatewayAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function deleteIpv4GatewayAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DeleteIpv4GatewayResponse';
+        $request = $this->deleteIpv4GatewayRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function deleteIpv4GatewayRequest($body)
+    {
+        $resourcePath = '/DeleteIpv4Gateway/2020-04-01/vpc/get/text_plain/';
         $queryParams = [];
         $httpBody = $body;
 
@@ -4098,6 +4656,68 @@ class VPCApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function describe95Traffic($body = null)
+    {
+        list($response) = $this->describe95TrafficWithHttpInfo($body);
+        return $response;
+    }
+
+    public function describe95TrafficWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\Describe95TrafficResponse';
+        $request = $this->describe95TrafficRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function describe95TrafficAsync($body = null)
+    {
+        return $this->describe95TrafficAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function describe95TrafficAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\Describe95TrafficResponse';
+        $request = $this->describe95TrafficRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function describe95TrafficRequest($body)
+    {
+        $resourcePath = '/Describe95Traffic/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function describeBandwidthPackages($body = null)
     {
         list($response) = $this->describeBandwidthPackagesWithHttpInfo($body);
@@ -4842,6 +5462,68 @@ class VPCApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function describeIpamOrganizationAccount($body = null)
+    {
+        list($response) = $this->describeIpamOrganizationAccountWithHttpInfo($body);
+        return $response;
+    }
+
+    public function describeIpamOrganizationAccountWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DescribeIpamOrganizationAccountResponse';
+        $request = $this->describeIpamOrganizationAccountRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function describeIpamOrganizationAccountAsync($body = null)
+    {
+        return $this->describeIpamOrganizationAccountAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function describeIpamOrganizationAccountAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DescribeIpamOrganizationAccountResponse';
+        $request = $this->describeIpamOrganizationAccountRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function describeIpamOrganizationAccountRequest($body)
+    {
+        $resourcePath = '/DescribeIpamOrganizationAccount/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function describeIpamPoolAllocations($body = null)
     {
         list($response) = $this->describeIpamPoolAllocationsWithHttpInfo($body);
@@ -5372,6 +6054,68 @@ class VPCApi
     protected function describeIpamsRequest($body)
     {
         $resourcePath = '/DescribeIpams/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function describeIpv4Gateways($body = null)
+    {
+        list($response) = $this->describeIpv4GatewaysWithHttpInfo($body);
+        return $response;
+    }
+
+    public function describeIpv4GatewaysWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DescribeIpv4GatewaysResponse';
+        $request = $this->describeIpv4GatewaysRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function describeIpv4GatewaysAsync($body = null)
+    {
+        return $this->describeIpv4GatewaysAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function describeIpv4GatewaysAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DescribeIpv4GatewaysResponse';
+        $request = $this->describeIpv4GatewaysRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function describeIpv4GatewaysRequest($body)
+    {
+        $resourcePath = '/DescribeIpv4Gateways/2020-04-01/vpc/get/text_plain/';
         $queryParams = [];
         $httpBody = $body;
 
@@ -6826,6 +7570,68 @@ class VPCApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function detachIpv4Gateway($body = null)
+    {
+        list($response) = $this->detachIpv4GatewayWithHttpInfo($body);
+        return $response;
+    }
+
+    public function detachIpv4GatewayWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DetachIpv4GatewayResponse';
+        $request = $this->detachIpv4GatewayRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function detachIpv4GatewayAsync($body = null)
+    {
+        return $this->detachIpv4GatewayAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function detachIpv4GatewayAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DetachIpv4GatewayResponse';
+        $request = $this->detachIpv4GatewayRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function detachIpv4GatewayRequest($body)
+    {
+        $resourcePath = '/DetachIpv4Gateway/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function detachNetworkInterface($body = null)
     {
         list($response) = $this->detachNetworkInterfaceWithHttpInfo($body);
@@ -6950,6 +7756,130 @@ class VPCApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function disableIpamOrganizationTrustedService($body = null)
+    {
+        list($response) = $this->disableIpamOrganizationTrustedServiceWithHttpInfo($body);
+        return $response;
+    }
+
+    public function disableIpamOrganizationTrustedServiceWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DisableIpamOrganizationTrustedServiceResponse';
+        $request = $this->disableIpamOrganizationTrustedServiceRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function disableIpamOrganizationTrustedServiceAsync($body = null)
+    {
+        return $this->disableIpamOrganizationTrustedServiceAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function disableIpamOrganizationTrustedServiceAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DisableIpamOrganizationTrustedServiceResponse';
+        $request = $this->disableIpamOrganizationTrustedServiceRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function disableIpamOrganizationTrustedServiceRequest($body)
+    {
+        $resourcePath = '/DisableIpamOrganizationTrustedService/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function disableIpv4Gateway($body = null)
+    {
+        list($response) = $this->disableIpv4GatewayWithHttpInfo($body);
+        return $response;
+    }
+
+    public function disableIpv4GatewayWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DisableIpv4GatewayResponse';
+        $request = $this->disableIpv4GatewayRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function disableIpv4GatewayAsync($body = null)
+    {
+        return $this->disableIpv4GatewayAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function disableIpv4GatewayAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DisableIpv4GatewayResponse';
+        $request = $this->disableIpv4GatewayRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function disableIpv4GatewayRequest($body)
+    {
+        $resourcePath = '/DisableIpv4Gateway/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function disassociateEipAddress($body = null)
     {
         list($response) = $this->disassociateEipAddressWithHttpInfo($body);
@@ -7046,6 +7976,68 @@ class VPCApi
     protected function disassociateHaVipRequest($body)
     {
         $resourcePath = '/DisassociateHaVip/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function disassociateIpamResourceDiscovery($body = null)
+    {
+        list($response) = $this->disassociateIpamResourceDiscoveryWithHttpInfo($body);
+        return $response;
+    }
+
+    public function disassociateIpamResourceDiscoveryWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DisassociateIpamResourceDiscoveryResponse';
+        $request = $this->disassociateIpamResourceDiscoveryRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function disassociateIpamResourceDiscoveryAsync($body = null)
+    {
+        return $this->disassociateIpamResourceDiscoveryAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function disassociateIpamResourceDiscoveryAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\DisassociateIpamResourceDiscoveryResponse';
+        $request = $this->disassociateIpamResourceDiscoveryRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function disassociateIpamResourceDiscoveryRequest($body)
+    {
+        $resourcePath = '/DisassociateIpamResourceDiscovery/2020-04-01/vpc/get/text_plain/';
         $queryParams = [];
         $httpBody = $body;
 
@@ -7356,6 +8348,192 @@ class VPCApi
     protected function enableEipAddressHighResolutionMonitorRequest($body)
     {
         $resourcePath = '/EnableEipAddressHighResolutionMonitor/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function enableIpamOrganizationTrustedService($body = null)
+    {
+        list($response) = $this->enableIpamOrganizationTrustedServiceWithHttpInfo($body);
+        return $response;
+    }
+
+    public function enableIpamOrganizationTrustedServiceWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\EnableIpamOrganizationTrustedServiceResponse';
+        $request = $this->enableIpamOrganizationTrustedServiceRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function enableIpamOrganizationTrustedServiceAsync($body = null)
+    {
+        return $this->enableIpamOrganizationTrustedServiceAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function enableIpamOrganizationTrustedServiceAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\EnableIpamOrganizationTrustedServiceResponse';
+        $request = $this->enableIpamOrganizationTrustedServiceRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function enableIpamOrganizationTrustedServiceRequest($body)
+    {
+        $resourcePath = '/EnableIpamOrganizationTrustedService/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function enableIpv4Gateway($body = null)
+    {
+        list($response) = $this->enableIpv4GatewayWithHttpInfo($body);
+        return $response;
+    }
+
+    public function enableIpv4GatewayWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\EnableIpv4GatewayResponse';
+        $request = $this->enableIpv4GatewayRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function enableIpv4GatewayAsync($body = null)
+    {
+        return $this->enableIpv4GatewayAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function enableIpv4GatewayAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\EnableIpv4GatewayResponse';
+        $request = $this->enableIpv4GatewayRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function enableIpv4GatewayRequest($body)
+    {
+        $resourcePath = '/EnableIpv4Gateway/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function getAsyncTaskStatus($body = null)
+    {
+        list($response) = $this->getAsyncTaskStatusWithHttpInfo($body);
+        return $response;
+    }
+
+    public function getAsyncTaskStatusWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\GetAsyncTaskStatusResponse';
+        $request = $this->getAsyncTaskStatusRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function getAsyncTaskStatusAsync($body = null)
+    {
+        return $this->getAsyncTaskStatusAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function getAsyncTaskStatusAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\GetAsyncTaskStatusResponse';
+        $request = $this->getAsyncTaskStatusRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function getAsyncTaskStatusRequest($body)
+    {
+        $resourcePath = '/GetAsyncTaskStatus/2020-04-01/vpc/get/text_plain/';
         $queryParams = [];
         $httpBody = $body;
 
@@ -8438,6 +9616,68 @@ class VPCApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function modifyIpv4Gateway($body = null)
+    {
+        list($response) = $this->modifyIpv4GatewayWithHttpInfo($body);
+        return $response;
+    }
+
+    public function modifyIpv4GatewayWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\ModifyIpv4GatewayResponse';
+        $request = $this->modifyIpv4GatewayRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function modifyIpv4GatewayAsync($body = null)
+    {
+        return $this->modifyIpv4GatewayAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function modifyIpv4GatewayAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\ModifyIpv4GatewayResponse';
+        $request = $this->modifyIpv4GatewayRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function modifyIpv4GatewayRequest($body)
+    {
+        $resourcePath = '/ModifyIpv4Gateway/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function modifyIpv6AddressBandwidth($body = null)
     {
         list($response) = $this->modifyIpv6AddressBandwidthWithHttpInfo($body);
@@ -8968,6 +10208,130 @@ class VPCApi
     protected function modifySecurityGroupAttributesRequest($body)
     {
         $resourcePath = '/ModifySecurityGroupAttributes/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function modifySecurityGroupEgressBatch($body = null)
+    {
+        list($response) = $this->modifySecurityGroupEgressBatchWithHttpInfo($body);
+        return $response;
+    }
+
+    public function modifySecurityGroupEgressBatchWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\ModifySecurityGroupEgressBatchResponse';
+        $request = $this->modifySecurityGroupEgressBatchRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function modifySecurityGroupEgressBatchAsync($body = null)
+    {
+        return $this->modifySecurityGroupEgressBatchAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function modifySecurityGroupEgressBatchAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\ModifySecurityGroupEgressBatchResponse';
+        $request = $this->modifySecurityGroupEgressBatchRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function modifySecurityGroupEgressBatchRequest($body)
+    {
+        $resourcePath = '/ModifySecurityGroupEgressBatch/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function modifySecurityGroupIngressBatch($body = null)
+    {
+        list($response) = $this->modifySecurityGroupIngressBatchWithHttpInfo($body);
+        return $response;
+    }
+
+    public function modifySecurityGroupIngressBatchWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\ModifySecurityGroupIngressBatchResponse';
+        $request = $this->modifySecurityGroupIngressBatchRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function modifySecurityGroupIngressBatchAsync($body = null)
+    {
+        return $this->modifySecurityGroupIngressBatchAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function modifySecurityGroupIngressBatchAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\ModifySecurityGroupIngressBatchResponse';
+        $request = $this->modifySecurityGroupIngressBatchRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function modifySecurityGroupIngressBatchRequest($body)
+    {
+        $resourcePath = '/ModifySecurityGroupIngressBatch/2020-04-01/vpc/get/text_plain/';
         $queryParams = [];
         $httpBody = $body;
 
@@ -9864,6 +11228,68 @@ class VPCApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function revokeSecurityGroupEgressBatch($body = null)
+    {
+        list($response) = $this->revokeSecurityGroupEgressBatchWithHttpInfo($body);
+        return $response;
+    }
+
+    public function revokeSecurityGroupEgressBatchWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\RevokeSecurityGroupEgressBatchResponse';
+        $request = $this->revokeSecurityGroupEgressBatchRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function revokeSecurityGroupEgressBatchAsync($body = null)
+    {
+        return $this->revokeSecurityGroupEgressBatchAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function revokeSecurityGroupEgressBatchAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\RevokeSecurityGroupEgressBatchResponse';
+        $request = $this->revokeSecurityGroupEgressBatchRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function revokeSecurityGroupEgressBatchRequest($body)
+    {
+        $resourcePath = '/RevokeSecurityGroupEgressBatch/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function revokeSecurityGroupIngress($body = null)
     {
         list($response) = $this->revokeSecurityGroupIngressWithHttpInfo($body);
@@ -9898,6 +11324,68 @@ class VPCApi
     protected function revokeSecurityGroupIngressRequest($body)
     {
         $resourcePath = '/RevokeSecurityGroupIngress/2020-04-01/vpc/get/text_plain/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['text/plain']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function revokeSecurityGroupIngressBatch($body = null)
+    {
+        list($response) = $this->revokeSecurityGroupIngressBatchWithHttpInfo($body);
+        return $response;
+    }
+
+    public function revokeSecurityGroupIngressBatchWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\RevokeSecurityGroupIngressBatchResponse';
+        $request = $this->revokeSecurityGroupIngressBatchRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function revokeSecurityGroupIngressBatchAsync($body = null)
+    {
+        return $this->revokeSecurityGroupIngressBatchAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function revokeSecurityGroupIngressBatchAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Vpc\Model\RevokeSecurityGroupIngressBatchResponse';
+        $request = $this->revokeSecurityGroupIngressBatchRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function revokeSecurityGroupIngressBatchRequest($body)
+    {
+        $resourcePath = '/RevokeSecurityGroupIngressBatch/2020-04-01/vpc/get/text_plain/';
         $queryParams = [];
         $httpBody = $body;
 
