@@ -10,7 +10,7 @@ use Byteplus\Common\ApiException;
 use Byteplus\Common\HeaderSelector;
 use Byteplus\Common\Utils;
 
-class StsProvider extends Provider
+class StsProvider extends Provider implements StsProxyConfigurableProvider
 {
     const PROVIDER_NAME = 'StsCredentialProvider';
     const DEFAULT_REGION = 'ap-southeast-1';
@@ -36,6 +36,9 @@ class StsProvider extends Provider
     private $retryInterval;
     private $cachedCredentials;
     private $expirationTime;
+
+    /** @var StsHttpConfig proxy / TLS configuration for reaching the STS endpoint */
+    private $httpConfig;
 
     public function __construct(
         $ak,
@@ -75,6 +78,24 @@ class StsProvider extends Provider
         $this->maxRetries = max((int) $maxRetries, 1);
         $this->retryInterval = $retryInterval;
         $this->expirationTime = null;
+        $this->httpConfig = new StsHttpConfig();
+    }
+
+    /**
+     * @internal Create a client-local snapshot without inheriting cached credentials.
+     * @param string|array|null $proxy
+     * @return static
+     */
+    public function bindToProxy($proxy)
+    {
+        $bound = clone $this;
+        $bound->httpConfig = clone $this->httpConfig;
+        $bound->httpConfig->setProxyFallback($proxy);
+        // Only User-Agent is read from this Configuration during STS requests.
+        $bound->config = clone $this->config;
+        $bound->cachedCredentials = null;
+        $bound->expirationTime = null;
+        return $bound;
     }
 
     public function getCredentials()
@@ -220,14 +241,70 @@ class StsProvider extends Provider
         return $this;
     }
 
+    /**
+     * Set the forward proxy used to reach the STS endpoint.
+     *
+     * Format: scheme://[user:password@]host:port. Proxy credentials are sent
+     * with Basic auth. Leave unset to use the Configuration proxy fallback
+     * when supplied, then standard proxy environment variables.
+     *
+     * @param string|null $proxyUrl
+     * @return $this
+     */
+    public function setProxyUrl($proxyUrl)
+    {
+        $this->httpConfig->setProxyUrl($proxyUrl);
+        return $this;
+    }
+
+    /**
+     * @internal
+     * @param string|array|null $proxy Guzzle proxy option inherited from Configuration
+     * @return $this
+     */
+    public function setProxyFallback($proxy)
+    {
+        $this->httpConfig->setProxyFallback($proxy);
+        return $this;
+    }
+
+    /**
+     * Set a custom CA bundle (PEM) used to verify the STS server certificate.
+     * Useful when a corporate proxy performs TLS interception with a private CA
+     * that is not installed in the system trust store.
+     *
+     * @param string|null $caFile
+     * @return $this
+     */
+    public function setCaFile($caFile)
+    {
+        $this->httpConfig->setCaFile($caFile);
+        return $this;
+    }
+
+    /**
+     * Skip STS TLS certificate and hostname verification.
+     *
+     * WARNING: only for debugging (self-signed certs / proxy interception).
+     * Never enable in production; use setCaFile() instead.
+     *
+     * @param bool $insecureSkipVerify
+     * @return $this
+     */
+    public function setInsecureSkipVerify($insecureSkipVerify)
+    {
+        $this->httpConfig->setInsecureSkipVerify($insecureSkipVerify);
+        return $this;
+    }
+
     private function sendWithRetry(Request $request)
     {
-        $client = new Client([
+        $clientOptions = $this->httpConfig->applyTo([
             'timeout' => $this->timeout,
             'connect_timeout' => $this->connectTimeout,
-            'verify' => true,
             'http_errors' => false,
         ]);
+        $client = new Client($clientOptions);
         $lastException = null;
 
         // $this->maxRetries carries total-attempt semantics here (see the

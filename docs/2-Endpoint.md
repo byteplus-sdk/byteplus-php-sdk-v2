@@ -15,6 +15,10 @@ You can specify a custom endpoint when initializing the client:
 `setHost()` accepts a hostname (with an optional port) or an HTTP(S) origin URL.
 An explicit URL scheme overrides the configured scheme, and a trailing `/` is allowed.
 The request's `Host` header contains only the hostname and optional port, without the scheme or trailing `/`.
+Default ports are removed for the effective scheme (`443` for HTTPS, `80` for
+HTTP); non-default ports are preserved. This applies to both bare hostnames and
+origin URLs. Requests, signing `Host` headers and presigned URLs use the same
+normalized authority.
 Origin URLs containing user information, non-root paths, query parameters or fragments throw
 `InvalidArgumentException` before the request is sent. Supply resource paths and API parameters separately.
 

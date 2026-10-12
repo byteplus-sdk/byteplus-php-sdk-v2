@@ -4,7 +4,7 @@ namespace Byteplus\Common\Auth\Providers;
 
 use Byteplus\Common\ApiException;
 
-class SamlCredentialProvider extends Provider
+class SamlCredentialProvider extends Provider implements StsProxyConfigurableProvider
 {
     use StsCredentialTrait;
 
@@ -118,7 +118,7 @@ class SamlCredentialProvider extends Provider
         $responseBody = StsFormRequest::doPostWithRetry(
             $this->stsEndpoint, $this->schema, $queryParams,
             $formBody, $this->maxRetries, $this->retryInterval,
-            self::PROVIDER_NAME
+            self::PROVIDER_NAME, $this->httpConfig
         );
 
         $content = json_decode($responseBody, true);
