@@ -4,7 +4,7 @@ namespace Byteplus\Common\Auth\Providers;
 
 use Byteplus\Common\ApiException;
 
-class OidcCredentialProvider extends Provider
+class OidcCredentialProvider extends Provider implements StsProxyConfigurableProvider
 {
     use StsCredentialTrait;
 
@@ -114,7 +114,7 @@ class OidcCredentialProvider extends Provider
         $responseBody = StsFormRequest::doPostWithRetry(
             $this->stsEndpoint, $this->schema, $queryParams,
             $formBody, $this->maxRetries, $this->retryInterval,
-            self::PROVIDER_NAME
+            self::PROVIDER_NAME, $this->httpConfig
         );
 
         $content = json_decode($responseBody, true);

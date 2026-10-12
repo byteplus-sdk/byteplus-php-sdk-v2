@@ -162,6 +162,11 @@ $sts = new \Byteplus\Common\Auth\Providers\StsProvider(
 //     ->setMaxRetries(3)
 //     ->setRetryInterval(1);
 
+// Optional: reach STS through a forward proxy and/or customize TLS trust.
+// $sts->setProxyUrl('http://user:pass@10.0.0.1:8080') // forward proxy, scheme://[user:password@]host:port; Basic auth; empty falls back to Configuration, then proxy environment variables
+//     ->setCaFile('/path/to/ca.pem')                  // custom CA bundle (PEM) to verify the STS server certificate; empty uses the system trust store
+//     ->setInsecureSkipVerify(false);                 // set true to skip STS TLS verification (debugging only, never in production)
+
 try {
     $result = $sts->getCredentials();
     print_r($result);
@@ -202,6 +207,11 @@ $provider = new \Byteplus\Common\Auth\Providers\OidcCredentialProvider(
 // $provider->setSchema('https')       // 'http' or 'https', default 'https'
 //          ->setMaxRetries(3)          // total attempts including the first, minimum 1
 //          ->setRetryInterval(1);      // seconds between retries, default 1
+
+// Optional: reach STS through a forward proxy and/or customize TLS trust.
+// $provider->setProxyUrl('http://user:pass@10.0.0.1:8080') // forward proxy; empty falls back to Configuration, then proxy environment variables
+//          ->setCaFile('/path/to/ca.pem')                  // custom CA bundle (PEM); empty uses the system trust store
+//          ->setInsecureSkipVerify(false);                 // set true to skip STS TLS verification (debugging only)
 
 $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
     ->setRegion("cn-beijing")
@@ -252,9 +262,75 @@ $provider = new \Byteplus\Common\Auth\Providers\SamlCredentialProvider(
 //          ->setMaxRetries(3)          // total attempts including the first, minimum 1
 //          ->setRetryInterval(1);      // seconds between retries, default 1
 
+// Optional: reach STS through a forward proxy and/or customize TLS trust.
+// $provider->setProxyUrl('http://user:pass@10.0.0.1:8080') // forward proxy; empty falls back to Configuration, then proxy environment variables
+//          ->setCaFile('/path/to/ca.pem')                  // custom CA bundle (PEM); empty uses the system trust store
+//          ->setInsecureSkipVerify(false);                 // set true to skip STS TLS verification (debugging only)
+
 $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
     ->setRegion("cn-beijing")
     ->setCredentialProvider($provider);
+```
+
+### STS Proxy and TLS (AssumeRole / OIDC / SAML)
+
+`StsProvider`, `OidcCredentialProvider` and `SamlCredentialProvider` share three
+optional fluent setters that control how the SDK reaches the STS endpoint. They
+are useful when the client sits behind a corporate forward proxy, or when the
+proxy performs TLS interception with a private CA.
+
+When one of these providers is installed directly on `Configuration`, the existing
+`setProxy()`, `setHttpProxy()` and `setHttpsProxy()` settings are also used for
+the STS credential request. The priority is: provider `setProxyUrl()` >
+`Configuration::setProxy()` > the HTTP/HTTPS proxy settings > standard proxy
+environment variables. This fallback applies to the proxy only; the provider TLS
+settings remain independent from the business API TLS settings.
+
+Proxy empty-value behavior matches business API requests. An empty provider
+`setProxyUrl()` value does not override Configuration. An effective Configuration
+proxy of `null` leaves Guzzle's `proxy` option unset, so environment variables may
+apply; `''` explicitly disables proxying. Proxy maps are passed through unchanged:
+an empty map or a map that omits the request scheme may fall back to the
+corresponding environment variable. An empty string `''` for a scheme (for example,
+`['https' => '']`) disables its proxy. A `null` scheme value (for example,
+`['https' => null]`) is treated as unset and may fall back to that scheme's
+environment proxy.
+
+| Setter | Purpose | Default |
+| --- | --- | --- |
+| `setProxyUrl($url)` | Forward proxy in the form `scheme://[user:password@]host:port`. Proxy credentials are sent with Basic auth; percent-encode special characters in the username or password as required by RFC 3986. When empty, the SDK falls back to the `Configuration` proxy and then standard `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` environment variables (handled by Guzzle/curl). | unset (Configuration/env fallback) |
+| `setCaFile($path)` | Path to a custom CA bundle (PEM) used to verify the STS server certificate. Use it when the STS/proxy certificate is signed by a private CA that is not in the system trust store. | unset (system trust store) |
+| `setInsecureSkipVerify($bool)` | When `true`, skips STS TLS certificate and hostname verification. | `false` |
+
+> ⚠️ **Notes**
+>
+> 1. `setInsecureSkipVerify(true)` disables certificate validation and exposes the
+>    connection to man-in-the-middle attacks. Use it only for debugging; in
+>    production trust a private CA via `setCaFile()` instead.
+> 2. `setInsecureSkipVerify(true)` takes precedence over `setCaFile()`.
+>    If both are set, the CA file must still exist and be readable.
+> 3. An invalid provider proxy URL or an unreadable CA file raises an
+>    `InvalidArgumentException` when credentials are fetched.
+
+```php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Example: AssumeRole through an HTTPS-intercepting corporate proxy that uses a
+// private CA. Works the same way on OidcCredentialProvider / SamlCredentialProvider.
+$sts = new \Byteplus\Common\Auth\Providers\StsProvider(
+    "Your ak",
+    "Your sk",
+    "Your role name",
+    "Your account id",
+    "ap-southeast-1"
+);
+$sts->setProxyUrl('http://user:pass@10.0.0.1:8080')
+    ->setCaFile('/etc/pki/corp-ca.pem');
+    // ->setInsecureSkipVerify(true); // debugging only
+
+$result = $sts->getCredentials();
+print_r($result);
 ```
 
 ### Environment Variable Credential Provider

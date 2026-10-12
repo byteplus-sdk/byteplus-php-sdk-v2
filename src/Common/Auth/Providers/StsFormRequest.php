@@ -33,15 +33,17 @@ class StsFormRequest
     /**
      * Send a form-encoded POST to the STS endpoint with retry.
      *
-     * @param string $endpoint       bare host (e.g. sts.ap-southeast-1.byteplusapi.com)
-     * @param string $schema         'http' or 'https'
-     * @param array  $queryParams    query string params (e.g. Action, Version, Policy for OIDC)
-     * @param string $formBody       URL-encoded form body (http_build_query result)
-     * @param int    $maxRetries     total attempts, including the first; values below 1 become 1
-     * @param int    $retryInterval  seconds between retries
-     * @param string $providerName   provider name for error messages
+     * @param string             $endpoint       bare host (e.g. sts.ap-southeast-1.byteplusapi.com)
+     * @param string             $schema         'http' or 'https'
+     * @param array              $queryParams    query string params (e.g. Action, Version, Policy for OIDC)
+     * @param string             $formBody       URL-encoded form body (http_build_query result)
+     * @param int                $maxRetries     total attempts, including the first; values below 1 become 1
+     * @param int                $retryInterval  seconds between retries
+     * @param string             $providerName   provider name for error messages
+     * @param StsHttpConfig|null $httpConfig     proxy / TLS configuration for reaching STS
      * @return string response body
      * @throws ApiException on failure after all attempts exhausted
+     * @throws \InvalidArgumentException on invalid proxy URL / unreadable CA file
      */
     public static function doPostWithRetry(
         $endpoint,
@@ -50,15 +52,17 @@ class StsFormRequest
         $formBody,
         $maxRetries,
         $retryInterval,
-        $providerName
+        $providerName,
+        $httpConfig = null
     ) {
         $url = self::buildRequestUrl($endpoint, $schema, $queryParams);
+        $clientOptions = self::buildClientOptions($httpConfig);
 
         $attempts = max((int) $maxRetries, 1);
         $lastException = null;
         for ($attempt = 0; $attempt < $attempts; $attempt++) {
             try {
-                return self::doPost($url, $formBody, $providerName);
+                return self::doPost($url, $formBody, $providerName, $clientOptions);
             } catch (ApiException $e) {
                 if (!self::isRetryable($e)) {
                     throw $e;
@@ -73,14 +77,32 @@ class StsFormRequest
         throw $lastException;
     }
 
-    private static function doPost($url, $formBody, $providerName)
+    /**
+     * Build Guzzle client options, applying proxy / TLS from $httpConfig.
+     *
+     * @param StsHttpConfig|null $httpConfig
+     * @return array
+     * @throws \InvalidArgumentException on invalid proxy URL / unreadable CA file
+     */
+    private static function buildClientOptions($httpConfig)
     {
-        $client = new Client([
+        $options = [
             'timeout' => self::DEFAULT_TIMEOUT,
             'connect_timeout' => self::DEFAULT_CONNECT_TIMEOUT,
-            'verify' => true,
             'http_errors' => false,
-        ]);
+        ];
+
+        if ($httpConfig instanceof StsHttpConfig) {
+            return $httpConfig->applyTo($options);
+        }
+
+        $options['verify'] = true;
+        return $options;
+    }
+
+    private static function doPost($url, $formBody, $providerName, array $clientOptions)
+    {
+        $client = new Client($clientOptions);
 
         try {
             $response = $client->post($url, [
