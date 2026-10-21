@@ -83,7 +83,7 @@ class DefaultEndpointProvider extends EndpointProvider
             'kafka'          => new ServiceEndpointInfo('kafka', false, true),
             'kickart'        => new ServiceEndpointInfo('kickart', true, false),
             'rabbitmq'       => new ServiceEndpointInfo('rabbitmq', false, false),
-            'redis'          => new ServiceEndpointInfo('redis', false, true),
+            'redis' => new ServiceEndpointInfo('redis', false, true),
             'vod'            => new ServiceEndpointInfo('vod', false, false),
             'vs'             => new ServiceEndpointInfo('vs', true, false),
         ];

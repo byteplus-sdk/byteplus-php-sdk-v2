@@ -11,7 +11,7 @@ use ArrayAccess;
 use Byteplus\Common\ObjectSerializer;
 use Byteplus\Common\ModelInterface;
 
-class CreateEnterpriseDBInstanceResponse implements ModelInterface, ArrayAccess
+class InvolvedNodeForDescribePlannedEventImpactDetailOutput implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -20,7 +20,7 @@ class CreateEnterpriseDBInstanceResponse implements ModelInterface, ArrayAccess
       *
       * @var string
       */
-    protected static $swaggerModelName = 'CreateEnterpriseDBInstanceResponse';
+    protected static $swaggerModelName = 'InvolvedNodeForDescribePlannedEventImpactDetailOutput';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -28,8 +28,10 @@ class CreateEnterpriseDBInstanceResponse implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'instance_id' => 'string',
-        'order_no' => 'string'
+        'count' => 'int',
+        'node_ids' => 'string[]',
+        'role_name' => 'string',
+        'type' => 'string'
     ];
 
     /**
@@ -38,8 +40,10 @@ class CreateEnterpriseDBInstanceResponse implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'instance_id' => null,
-        'order_no' => null
+        'count' => 'int32',
+        'node_ids' => null,
+        'role_name' => null,
+        'type' => null
     ];
 
     /**
@@ -69,8 +73,10 @@ class CreateEnterpriseDBInstanceResponse implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'instance_id' => 'InstanceId',
-        'order_no' => 'OrderNO'
+        'count' => 'Count',
+        'node_ids' => 'NodeIds',
+        'role_name' => 'RoleName',
+        'type' => 'Type'
     ];
 
     /**
@@ -79,8 +85,10 @@ class CreateEnterpriseDBInstanceResponse implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'instance_id' => 'setInstanceId',
-        'order_no' => 'setOrderNo'
+        'count' => 'setCount',
+        'node_ids' => 'setNodeIds',
+        'role_name' => 'setRoleName',
+        'type' => 'setType'
     ];
 
     /**
@@ -89,8 +97,10 @@ class CreateEnterpriseDBInstanceResponse implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'instance_id' => 'getInstanceId',
-        'order_no' => 'getOrderNo'
+        'count' => 'getCount',
+        'node_ids' => 'getNodeIds',
+        'role_name' => 'getRoleName',
+        'type' => 'getType'
     ];
 
     /**
@@ -153,8 +163,10 @@ class CreateEnterpriseDBInstanceResponse implements ModelInterface, ArrayAccess
      */
     public function __construct($data = null)
     {
-        $this->container['instance_id'] = isset($data['instance_id']) ? $data['instance_id'] : null;
-        $this->container['order_no'] = isset($data['order_no']) ? $data['order_no'] : null;
+        $this->container['count'] = isset($data['count']) ? $data['count'] : null;
+        $this->container['node_ids'] = isset($data['node_ids']) ? $data['node_ids'] : null;
+        $this->container['role_name'] = isset($data['role_name']) ? $data['role_name'] : null;
+        $this->container['type'] = isset($data['type']) ? $data['type'] : null;
     }
 
     /**
@@ -182,49 +194,97 @@ class CreateEnterpriseDBInstanceResponse implements ModelInterface, ArrayAccess
 
 
     /**
-     * Gets instance_id
+     * Gets count
      *
-     * @return string
+     * @return int
      */
-    public function getInstanceId()
+    public function getCount()
     {
-        return $this->container['instance_id'];
+        return $this->container['count'];
     }
 
     /**
-     * Sets instance_id
+     * Sets count
      *
-     * @param string $instance_id instance_id
+     * @param int $count count
      *
      * @return $this
      */
-    public function setInstanceId($instance_id)
+    public function setCount($count)
     {
-        $this->container['instance_id'] = $instance_id;
+        $this->container['count'] = $count;
 
         return $this;
     }
 
     /**
-     * Gets order_no
+     * Gets node_ids
      *
-     * @return string
+     * @return string[]
      */
-    public function getOrderNo()
+    public function getNodeIds()
     {
-        return $this->container['order_no'];
+        return $this->container['node_ids'];
     }
 
     /**
-     * Sets order_no
+     * Sets node_ids
      *
-     * @param string $order_no order_no
+     * @param string[] $node_ids node_ids
      *
      * @return $this
      */
-    public function setOrderNo($order_no)
+    public function setNodeIds($node_ids)
     {
-        $this->container['order_no'] = $order_no;
+        $this->container['node_ids'] = $node_ids;
+
+        return $this;
+    }
+
+    /**
+     * Gets role_name
+     *
+     * @return string
+     */
+    public function getRoleName()
+    {
+        return $this->container['role_name'];
+    }
+
+    /**
+     * Sets role_name
+     *
+     * @param string $role_name role_name
+     *
+     * @return $this
+     */
+    public function setRoleName($role_name)
+    {
+        $this->container['role_name'] = $role_name;
+
+        return $this;
+    }
+
+    /**
+     * Gets type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->container['type'];
+    }
+
+    /**
+     * Sets type
+     *
+     * @param string $type type
+     *
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->container['type'] = $type;
 
         return $this;
     }
