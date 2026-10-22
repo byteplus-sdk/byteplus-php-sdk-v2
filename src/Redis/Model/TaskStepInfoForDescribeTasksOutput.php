@@ -11,7 +11,7 @@ use ArrayAccess;
 use Byteplus\Common\ObjectSerializer;
 use Byteplus\Common\ModelInterface;
 
-class ConfigureNodeForCreateEnterpriseDBInstanceInput implements ModelInterface, ArrayAccess
+class TaskStepInfoForDescribeTasksOutput implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -20,7 +20,7 @@ class ConfigureNodeForCreateEnterpriseDBInstanceInput implements ModelInterface,
       *
       * @var string
       */
-    protected static $swaggerModelName = 'ConfigureNodeForCreateEnterpriseDBInstanceInput';
+    protected static $swaggerModelName = 'TaskStepInfoForDescribeTasksOutput';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -28,7 +28,10 @@ class ConfigureNodeForCreateEnterpriseDBInstanceInput implements ModelInterface,
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'az' => 'string'
+        'name' => 'string',
+        'progress_desc' => 'string',
+        'step_progress' => 'int',
+        'step_status' => 'string'
     ];
 
     /**
@@ -37,7 +40,10 @@ class ConfigureNodeForCreateEnterpriseDBInstanceInput implements ModelInterface,
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'az' => null
+        'name' => null,
+        'progress_desc' => null,
+        'step_progress' => 'int32',
+        'step_status' => null
     ];
 
     /**
@@ -67,7 +73,10 @@ class ConfigureNodeForCreateEnterpriseDBInstanceInput implements ModelInterface,
      * @var string[]
      */
     protected static $attributeMap = [
-        'az' => 'AZ'
+        'name' => 'Name',
+        'progress_desc' => 'ProgressDesc',
+        'step_progress' => 'StepProgress',
+        'step_status' => 'StepStatus'
     ];
 
     /**
@@ -76,7 +85,10 @@ class ConfigureNodeForCreateEnterpriseDBInstanceInput implements ModelInterface,
      * @var string[]
      */
     protected static $setters = [
-        'az' => 'setAz'
+        'name' => 'setName',
+        'progress_desc' => 'setProgressDesc',
+        'step_progress' => 'setStepProgress',
+        'step_status' => 'setStepStatus'
     ];
 
     /**
@@ -85,7 +97,10 @@ class ConfigureNodeForCreateEnterpriseDBInstanceInput implements ModelInterface,
      * @var string[]
      */
     protected static $getters = [
-        'az' => 'getAz'
+        'name' => 'getName',
+        'progress_desc' => 'getProgressDesc',
+        'step_progress' => 'getStepProgress',
+        'step_status' => 'getStepStatus'
     ];
 
     /**
@@ -148,7 +163,10 @@ class ConfigureNodeForCreateEnterpriseDBInstanceInput implements ModelInterface,
      */
     public function __construct($data = null)
     {
-        $this->container['az'] = isset($data['az']) ? $data['az'] : null;
+        $this->container['name'] = isset($data['name']) ? $data['name'] : null;
+        $this->container['progress_desc'] = isset($data['progress_desc']) ? $data['progress_desc'] : null;
+        $this->container['step_progress'] = isset($data['step_progress']) ? $data['step_progress'] : null;
+        $this->container['step_status'] = isset($data['step_status']) ? $data['step_status'] : null;
     }
 
     /**
@@ -176,25 +194,97 @@ class ConfigureNodeForCreateEnterpriseDBInstanceInput implements ModelInterface,
 
 
     /**
-     * Gets az
+     * Gets name
      *
      * @return string
      */
-    public function getAz()
+    public function getName()
     {
-        return $this->container['az'];
+        return $this->container['name'];
     }
 
     /**
-     * Sets az
+     * Sets name
      *
-     * @param string $az az
+     * @param string $name name
      *
      * @return $this
      */
-    public function setAz($az)
+    public function setName($name)
     {
-        $this->container['az'] = $az;
+        $this->container['name'] = $name;
+
+        return $this;
+    }
+
+    /**
+     * Gets progress_desc
+     *
+     * @return string
+     */
+    public function getProgressDesc()
+    {
+        return $this->container['progress_desc'];
+    }
+
+    /**
+     * Sets progress_desc
+     *
+     * @param string $progress_desc progress_desc
+     *
+     * @return $this
+     */
+    public function setProgressDesc($progress_desc)
+    {
+        $this->container['progress_desc'] = $progress_desc;
+
+        return $this;
+    }
+
+    /**
+     * Gets step_progress
+     *
+     * @return int
+     */
+    public function getStepProgress()
+    {
+        return $this->container['step_progress'];
+    }
+
+    /**
+     * Sets step_progress
+     *
+     * @param int $step_progress step_progress
+     *
+     * @return $this
+     */
+    public function setStepProgress($step_progress)
+    {
+        $this->container['step_progress'] = $step_progress;
+
+        return $this;
+    }
+
+    /**
+     * Gets step_status
+     *
+     * @return string
+     */
+    public function getStepStatus()
+    {
+        return $this->container['step_status'];
+    }
+
+    /**
+     * Sets step_status
+     *
+     * @param string $step_status step_status
+     *
+     * @return $this
+     */
+    public function setStepStatus($step_status)
+    {
+        $this->container['step_status'] = $step_status;
 
         return $this;
     }

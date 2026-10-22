@@ -11,7 +11,7 @@ use ArrayAccess;
 use Byteplus\Common\ObjectSerializer;
 use Byteplus\Common\ModelInterface;
 
-class TagForCreateEnterpriseDBInstanceInput implements ModelInterface, ArrayAccess
+class SyncAllowListRequest implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -20,7 +20,7 @@ class TagForCreateEnterpriseDBInstanceInput implements ModelInterface, ArrayAcce
       *
       * @var string
       */
-    protected static $swaggerModelName = 'TagForCreateEnterpriseDBInstanceInput';
+    protected static $swaggerModelName = 'SyncAllowListRequest';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -28,8 +28,9 @@ class TagForCreateEnterpriseDBInstanceInput implements ModelInterface, ArrayAcce
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'key' => 'string',
-        'value' => 'string'
+        'allow_list_id' => 'string',
+        'dry_run' => 'bool',
+        'security_group_bind_infos' => '\Byteplus\Redis\Model\SecurityGroupBindInfoForSyncAllowListInput[]'
     ];
 
     /**
@@ -38,8 +39,9 @@ class TagForCreateEnterpriseDBInstanceInput implements ModelInterface, ArrayAcce
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'key' => null,
-        'value' => null
+        'allow_list_id' => null,
+        'dry_run' => null,
+        'security_group_bind_infos' => null
     ];
 
     /**
@@ -69,8 +71,9 @@ class TagForCreateEnterpriseDBInstanceInput implements ModelInterface, ArrayAcce
      * @var string[]
      */
     protected static $attributeMap = [
-        'key' => 'Key',
-        'value' => 'Value'
+        'allow_list_id' => 'AllowListId',
+        'dry_run' => 'DryRun',
+        'security_group_bind_infos' => 'SecurityGroupBindInfos'
     ];
 
     /**
@@ -79,8 +82,9 @@ class TagForCreateEnterpriseDBInstanceInput implements ModelInterface, ArrayAcce
      * @var string[]
      */
     protected static $setters = [
-        'key' => 'setKey',
-        'value' => 'setValue'
+        'allow_list_id' => 'setAllowListId',
+        'dry_run' => 'setDryRun',
+        'security_group_bind_infos' => 'setSecurityGroupBindInfos'
     ];
 
     /**
@@ -89,8 +93,9 @@ class TagForCreateEnterpriseDBInstanceInput implements ModelInterface, ArrayAcce
      * @var string[]
      */
     protected static $getters = [
-        'key' => 'getKey',
-        'value' => 'getValue'
+        'allow_list_id' => 'getAllowListId',
+        'dry_run' => 'getDryRun',
+        'security_group_bind_infos' => 'getSecurityGroupBindInfos'
     ];
 
     /**
@@ -153,8 +158,9 @@ class TagForCreateEnterpriseDBInstanceInput implements ModelInterface, ArrayAcce
      */
     public function __construct($data = null)
     {
-        $this->container['key'] = isset($data['key']) ? $data['key'] : null;
-        $this->container['value'] = isset($data['value']) ? $data['value'] : null;
+        $this->container['allow_list_id'] = isset($data['allow_list_id']) ? $data['allow_list_id'] : null;
+        $this->container['dry_run'] = isset($data['dry_run']) ? $data['dry_run'] : null;
+        $this->container['security_group_bind_infos'] = isset($data['security_group_bind_infos']) ? $data['security_group_bind_infos'] : null;
     }
 
     /**
@@ -182,49 +188,73 @@ class TagForCreateEnterpriseDBInstanceInput implements ModelInterface, ArrayAcce
 
 
     /**
-     * Gets key
+     * Gets allow_list_id
      *
      * @return string
      */
-    public function getKey()
+    public function getAllowListId()
     {
-        return $this->container['key'];
+        return $this->container['allow_list_id'];
     }
 
     /**
-     * Sets key
+     * Sets allow_list_id
      *
-     * @param string $key key
+     * @param string $allow_list_id allow_list_id
      *
      * @return $this
      */
-    public function setKey($key)
+    public function setAllowListId($allow_list_id)
     {
-        $this->container['key'] = $key;
+        $this->container['allow_list_id'] = $allow_list_id;
 
         return $this;
     }
 
     /**
-     * Gets value
+     * Gets dry_run
      *
-     * @return string
+     * @return bool
      */
-    public function getValue()
+    public function getDryRun()
     {
-        return $this->container['value'];
+        return $this->container['dry_run'];
     }
 
     /**
-     * Sets value
+     * Sets dry_run
      *
-     * @param string $value value
+     * @param bool $dry_run dry_run
      *
      * @return $this
      */
-    public function setValue($value)
+    public function setDryRun($dry_run)
     {
-        $this->container['value'] = $value;
+        $this->container['dry_run'] = $dry_run;
+
+        return $this;
+    }
+
+    /**
+     * Gets security_group_bind_infos
+     *
+     * @return \Byteplus\Redis\Model\SecurityGroupBindInfoForSyncAllowListInput[]
+     */
+    public function getSecurityGroupBindInfos()
+    {
+        return $this->container['security_group_bind_infos'];
+    }
+
+    /**
+     * Sets security_group_bind_infos
+     *
+     * @param \Byteplus\Redis\Model\SecurityGroupBindInfoForSyncAllowListInput[] $security_group_bind_infos security_group_bind_infos
+     *
+     * @return $this
+     */
+    public function setSecurityGroupBindInfos($security_group_bind_infos)
+    {
+        $this->container['security_group_bind_infos'] = $security_group_bind_infos;
 
         return $this;
     }
