@@ -234,41 +234,8 @@ class ListForListResourcePackagesOutput implements ModelInterface, ArrayAccess
         return self::$getters;
     }
 
-    /**
-     * The original name of the model.
-     *
-     * @return string
-     */
-    public function getModelName()
-    {
-        return self::$swaggerModelName;
-    }
-
-    const STATUS_EFFECTIVE = 'Effective';
-    const STATUS_NOT_EFFECTIVE = 'NotEffective';
-    const STATUS_FAILED_TO_CREATE = 'FailedToCreate';
-    const STATUS_USED_UP = 'UsedUp';
-    const STATUS_EXPIRED = 'Expired';
-    const STATUS_REFUNDED = 'Refunded';
     
 
-    
-    /**
-     * Gets allowable values of the enum
-     *
-     * @return string[]
-     */
-    public function getStatusAllowableValues()
-    {
-        return [
-            self::STATUS_EFFECTIVE,
-            self::STATUS_NOT_EFFECTIVE,
-            self::STATUS_FAILED_TO_CREATE,
-            self::STATUS_USED_UP,
-            self::STATUS_EXPIRED,
-            self::STATUS_REFUNDED,
-        ];
-    }
     
 
     /**
@@ -320,14 +287,6 @@ class ListForListResourcePackagesOutput implements ModelInterface, ArrayAccess
     public function listInvalidProperties()
     {
         $invalidProperties = [];
-
-        $allowedValues = $this->getStatusAllowableValues();
-        if (!is_null($this->container['status']) && !in_array($this->container['status'], $allowedValues, true)) {
-            $invalidProperties[] = sprintf(
-                "invalid value for 'status', must be one of '%s'",
-                implode("', '", $allowedValues)
-            );
-        }
 
         return $invalidProperties;
     }
@@ -795,15 +754,6 @@ class ListForListResourcePackagesOutput implements ModelInterface, ArrayAccess
      */
     public function setStatus($status)
     {
-        $allowedValues = $this->getStatusAllowableValues();
-        if (!is_null($status) && !in_array($status, $allowedValues, true)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    "Invalid value for 'status', must be one of '%s'",
-                    implode("', '", $allowedValues)
-                )
-            );
-        }
         $this->container['status'] = $status;
 
         return $this;

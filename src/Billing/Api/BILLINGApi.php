@@ -1556,6 +1556,68 @@ class BILLINGApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function listBudgetFilterConfigurationInfo($body = null)
+    {
+        list($response) = $this->listBudgetFilterConfigurationInfoWithHttpInfo($body);
+        return $response;
+    }
+
+    public function listBudgetFilterConfigurationInfoWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Billing\Model\ListBudgetFilterConfigurationInfoResponse';
+        $request = $this->listBudgetFilterConfigurationInfoRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function listBudgetFilterConfigurationInfoAsync($body = null)
+    {
+        return $this->listBudgetFilterConfigurationInfoAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function listBudgetFilterConfigurationInfoAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Billing\Model\ListBudgetFilterConfigurationInfoResponse';
+        $request = $this->listBudgetFilterConfigurationInfoRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function listBudgetFilterConfigurationInfoRequest($body)
+    {
+        $resourcePath = '/ListBudgetFilterConfigurationInfo/2022-01-01/billing/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function listBudgetFilterOwnerID($body = null)
     {
         list($response) = $this->listBudgetFilterOwnerIDWithHttpInfo($body);
@@ -2300,6 +2362,68 @@ class BILLINGApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function listElement($body = null)
+    {
+        list($response) = $this->listElementWithHttpInfo($body);
+        return $response;
+    }
+
+    public function listElementWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Billing\Model\ListElementResponse';
+        $request = $this->listElementRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function listElementAsync($body = null)
+    {
+        return $this->listElementAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function listElementAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Billing\Model\ListElementResponse';
+        $request = $this->listElementRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function listElementRequest($body)
+    {
+        $resourcePath = '/ListElement/2022-01-01/billing/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function listFinancialRelation($body = null)
     {
         list($response) = $this->listFinancialRelationWithHttpInfo($body);
@@ -2582,6 +2706,130 @@ class BILLINGApi
     protected function listPackageUsageDetailsRequest($body)
     {
         $resourcePath = '/ListPackageUsageDetails/2022-01-01/billing/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function listProduct($body = null)
+    {
+        list($response) = $this->listProductWithHttpInfo($body);
+        return $response;
+    }
+
+    public function listProductWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Billing\Model\ListProductResponse';
+        $request = $this->listProductRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function listProductAsync($body = null)
+    {
+        return $this->listProductAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function listProductAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Billing\Model\ListProductResponse';
+        $request = $this->listProductRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function listProductRequest($body)
+    {
+        $resourcePath = '/ListProduct/2022-01-01/billing/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function listProductStructure($body = null)
+    {
+        list($response) = $this->listProductStructureWithHttpInfo($body);
+        return $response;
+    }
+
+    public function listProductStructureWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Billing\Model\ListProductStructureResponse';
+        $request = $this->listProductStructureRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function listProductStructureAsync($body = null)
+    {
+        return $this->listProductStructureAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function listProductStructureAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Billing\Model\ListProductStructureResponse';
+        $request = $this->listProductStructureRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function listProductStructureRequest($body)
+    {
+        $resourcePath = '/ListProductStructure/2022-01-01/billing/post/application_json/';
         $queryParams = [];
         $httpBody = $body;
 
@@ -3016,6 +3264,130 @@ class BILLINGApi
     protected function queryBudgetDetailRequest($body)
     {
         $resourcePath = '/QueryBudgetDetail/2022-01-01/billing/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function queryBudgetSplitItemID($body = null)
+    {
+        list($response) = $this->queryBudgetSplitItemIDWithHttpInfo($body);
+        return $response;
+    }
+
+    public function queryBudgetSplitItemIDWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Billing\Model\QueryBudgetSplitItemIDResponse';
+        $request = $this->queryBudgetSplitItemIDRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function queryBudgetSplitItemIDAsync($body = null)
+    {
+        return $this->queryBudgetSplitItemIDAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function queryBudgetSplitItemIDAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Billing\Model\QueryBudgetSplitItemIDResponse';
+        $request = $this->queryBudgetSplitItemIDRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function queryBudgetSplitItemIDRequest($body)
+    {
+        $resourcePath = '/QueryBudgetSplitItemID/2022-01-01/billing/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function queryBudgetSplitItemName($body = null)
+    {
+        list($response) = $this->queryBudgetSplitItemNameWithHttpInfo($body);
+        return $response;
+    }
+
+    public function queryBudgetSplitItemNameWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Billing\Model\QueryBudgetSplitItemNameResponse';
+        $request = $this->queryBudgetSplitItemNameRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function queryBudgetSplitItemNameAsync($body = null)
+    {
+        return $this->queryBudgetSplitItemNameAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function queryBudgetSplitItemNameAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Billing\Model\QueryBudgetSplitItemNameResponse';
+        $request = $this->queryBudgetSplitItemNameRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function queryBudgetSplitItemNameRequest($body)
+    {
+        $resourcePath = '/QueryBudgetSplitItemName/2022-01-01/billing/post/application_json/';
         $queryParams = [];
         $httpBody = $body;
 
