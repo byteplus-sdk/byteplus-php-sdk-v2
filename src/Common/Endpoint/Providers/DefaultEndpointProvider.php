@@ -42,7 +42,7 @@ class DefaultEndpointProvider extends EndpointProvider
             'transitrouter'  => new ServiceEndpointInfo('transitrouter', false, true),
             'directconnect'  => new ServiceEndpointInfo('directconnect', false, true),
             'vpn'            => new ServiceEndpointInfo('vpn', false, true),
-            'natgateway'     => new ServiceEndpointInfo('natgateway', false, true),
+            'natgateway' => new ServiceEndpointInfo('natgateway', false, true),
             'rds_mysql'      => new ServiceEndpointInfo('rds_mysql', false, true),
             'smc'            => new ServiceEndpointInfo('smc', true, false),
             'iam' => new ServiceEndpointInfo('iam', true, true),
