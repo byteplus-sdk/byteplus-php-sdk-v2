@@ -366,6 +366,8 @@ class StandardEndpointProvider extends EndpointProvider
         self::checkNonEmpty('service', $service);
         self::checkNonEmpty('region', $region);
 
+        self::validateServiceAndRegion($service, $region);
+
         if (!self::regionMatcher()->validate($region)) {
             throw new StandProviderError(
                 'InvalidRegion',

@@ -4,6 +4,7 @@ namespace Byteplus\Common\Interceptor\Interceptors;
 
 use Byteplus\Common\LogHelper;
 use Byteplus\Common\SdkLogger;
+use Byteplus\Common\Endpoint\EndpointProvider;
 
 class ResolveEndpointInterceptor extends Interceptor
 {
@@ -26,6 +27,7 @@ class ResolveEndpointInterceptor extends Interceptor
         if (!$host) {
             $pathParts = explode('/', $context->request->resourcePath);
             $service = isset($pathParts[3]) ? $pathParts[3] : '';
+            EndpointProvider::validateServiceAndRegion($service, $context->request->region);
             $endpointResolver = $context->request->endpointProvider->endpointFor(
                 $service,
                 $context->request->region,

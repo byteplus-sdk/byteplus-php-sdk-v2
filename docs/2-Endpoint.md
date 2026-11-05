@@ -76,7 +76,7 @@ BytePlus provides a flexible endpoint resolution mechanism. The SDK automaticall
 
     When a service entry has `goChinaEnabled=true` and the request region is in the Chinese mainland (a `cn-*` prefix but not one of the non-mainland regions such as `cn-hongkong`), the resolver appends the `.cn` suffix.
 
-    Whether Go China applies is decided by the service itself and cannot be overridden. Regions are normalized with `strtolower(trim(...))` before matching, so `CN-Beijing`, `  cn-beijing  ` and `cn-beijing` are treated identically.
+    Whether Go China applies is decided by the service itself and cannot be overridden. The raw region is validated first, then normalized with `strtolower(trim(...))` before matching, so `CN-Beijing` and `cn-beijing` resolve to the same endpoint. A region with surrounding whitespace (such as `"  cn-beijing  "`) is rejected with `InvalidRegion` before normalization; see [Region Whitespace and Compatibility](#region-whitespace-and-compatibility).
 
 4. **Endpoint construction**
 
@@ -134,6 +134,29 @@ try {
 
 When you hit this error, first try upgrading the SDK. If the service is genuinely not carried by the SDK yet, set the endpoint explicitly via `Configuration::setHost(...)` or supply a custom endpoint provider.
 
+#### Region Whitespace and Compatibility
+
+Default endpoint resolution validates the raw region without calling `trim()` first.
+Values such as `" ap-southeast-1"`, `"ap-southeast-1 "`, `"\tap-southeast-1"`,
+`"ap-southeast-1\n"`, and whitespace-only strings raise `Byteplus\Common\ApiException`
+with `getErrorCode()` equal to `InvalidRegion` and status 400.
+
+- Direct calls to `DefaultEndpointProvider::endpointFor(...)` or `getDefaultEndpoint(...)` also reject leading or trailing whitespace. Letter-case handling for valid regions is unchanged: default resolution still lowercases the region when building the host.
+- When no explicit `host` is set, the client validates the region before calling any Endpoint Provider, signing or sending the request. `Configuration::setRegion(...)` only stores the raw value; it neither trims it nor performs this validation immediately.
+- `null` and the empty string keep the existing missing-value handling of each entry point; a whitespace-only string is not an empty string.
+
+**Behavior change:** direct calls to the default endpoint resolver no longer
+accept surrounding whitespace and raise `InvalidRegion` instead. Previous
+versions trimmed the region when building the host, but signing still used the
+raw region. Getting the correct endpoint back did not mean that a client request
+with that region would succeed.
+
+If your application accepts surrounding whitespace in text input, call `trim()`
+before `setRegion(...)` or a direct resolver call, and use the same cleaned region
+for client configuration and endpoint resolution. Do not trim only the value
+passed to the Endpoint Provider while leaving the signing region unchanged.
+The trimmed value must still pass validation.
+
 #### Standard Endpoint Provider
 
 `Byteplus\Common\Endpoint\Providers\StandardEndpointProvider` is an optional,
@@ -177,12 +200,32 @@ service, accepted custom entries include:
 - `['mysvc' => (object) ['IsGlobal' => true]]`: also accepts public `isGlobal`.
   `new \Byteplus\Common\Endpoint\Providers\ServiceInfo('mysvc', true)` is supported.
 
-Errors are `StandProviderError`; read the symbolic error with `getStandCode()`,
+A non-empty service or region that is not a valid endpoint label (ASCII letters,
+digits, `-` and `_`, starting with a letter and not ending with `-` or `_`) is
+rejected before any host is built with `Byteplus\Common\ApiException`, error code
+`InvalidService`/`InvalidRegion` (`getErrorCode()`) and status 400; the default and standard
+providers apply this check, and so does the client request path before calling any
+endpoint provider when no explicit host is set.
+Other errors are `StandProviderError`; read the symbolic error with `getStandCode()`,
 not the numeric `getCode()`: `InvalidArgument` for non-string/blank service or
-region, `InvalidRegion` for unsupported region syntax, `ServiceNotFound` for an
+region (on the client request path, a non-empty one such as `' '` or `1` gets the
+`ApiException` above instead), `InvalidRegion` for unsupported region syntax, `ServiceNotFound` for an
 unregistered service, `InvalidCustomService` for an unsupported entry, and
 `TemplateExecuteError` for an unknown placeholder. This is not full hostname
 validation: literal text and replacement values remain the caller's responsibility.
+
+**Behavior change:** with the Standard provider (calling `endpointFor()` directly,
+or sending requests through a client configured with it), a service or region
+containing illegal characters (such as `ap-southeast-1.evil.com`, `x@127.0.0.1#`,
+`" ap-southeast-1"` with surrounding whitespace, or `ecs.evil.com`) now throws
+`Byteplus\Common\ApiException` with status 400 instead of `StandProviderError`;
+read the error code `InvalidRegion`/`InvalidService` with `getErrorCode()`, not
+`getStandCode()`. Previous versions reported such a service as `ServiceNotFound`.
+`ApiException` and `StandProviderError` are unrelated classes, so code that only
+catches `StandProviderError` must also catch `ApiException`, or catch their
+common parent `\Exception`. Blank values, unregistered services and well-formed
+but unsupported regions (such as `AP-SOUTHEAST-1`) still throw
+`StandProviderError`, as before.
 
 DualStack uses an explicit `true`/`false` first; `null` reads
 `BYTEPLUS_ENABLE_DUALSTACK`. `customBootstrapRegion` has no effect.

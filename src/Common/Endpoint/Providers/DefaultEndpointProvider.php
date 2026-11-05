@@ -143,6 +143,8 @@ class DefaultEndpointProvider extends EndpointProvider
      */
     public function endpointFor($service, $region, $customBootstrapRegion = null, $useDualStack = null)
     {
+        self::validateServiceAndRegion($service, $region);
+
         if (is_array($this->customEndpoints) && array_key_exists($service, $this->customEndpoints)) {
             $conf = $this->customEndpoints[$service];
             $host = $conf->getEndpointFor($region);
@@ -171,6 +173,7 @@ class ServiceEndpointInfo
 
     private function getStandardizeDomainServiceCode()
     {
+        EndpointProvider::validateService($this->service);
         return strtolower(str_replace('_', '-', $this->service));
     }
 
@@ -192,6 +195,9 @@ class ServiceEndpointInfo
 
     public function getEndpointFor($region, $suffix = ENDPOINT_SUFFIX)
     {
+        // Validate the raw value: normalizeRegion only trims and lowercases it.
+        EndpointProvider::validateRegion($region);
+
         $normalized = DefaultEndpointProvider::normalizeRegion($region);
         $cnSuffix = ($this->goChinaEnabled && self::isCNMainlandRegion($normalized)) ? CN_SUFFIX : '';
         $serviceCode = $this->getStandardizeDomainServiceCode();
