@@ -73,7 +73,7 @@ class DefaultEndpointProvider extends EndpointProvider
             'eco_partner'    => new ServiceEndpointInfo('eco_partner', true, false),
             'milvus'         => new ServiceEndpointInfo('milvus', false, false),
             'llmshield'      => new ServiceEndpointInfo('llmshield', false, false),
-            'billing'        => new ServiceEndpointInfo('billing', true, true),
+            'billing' => new ServiceEndpointInfo('billing', true, true),
             'id'             => new ServiceEndpointInfo('id', false, false),
             'clawsentry'     => new ServiceEndpointInfo('clawsentry', false, false),
             'resourcecenter' => new ServiceEndpointInfo('resourcecenter', true, false),
