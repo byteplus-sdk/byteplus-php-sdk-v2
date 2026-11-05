@@ -86,6 +86,7 @@ class DefaultEndpointProvider extends EndpointProvider
             'redis' => new ServiceEndpointInfo('redis', false, true),
             'vod'            => new ServiceEndpointInfo('vod', false, false),
             'vs'             => new ServiceEndpointInfo('vs', true, false),
+            'mse' => new ServiceEndpointInfo('mse', false, false),
         ];
     }
 
