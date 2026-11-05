@@ -5,6 +5,7 @@ namespace Byteplus\Common\Auth\Providers;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use Byteplus\Common\ApiException;
+use Byteplus\Common\Endpoint\EndpointProvider;
 
 /**
  * @internal
@@ -180,6 +181,8 @@ class SsoCredentialProvider extends Provider
         if ($region === '') {
             $region = self::DEFAULT_REGION;
         }
+        // The region is formatted into the OAuth and portal host names.
+        EndpointProvider::validateRegion($region);
 
         return [$sessionName, $startURL, $region];
     }

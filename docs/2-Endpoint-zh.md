@@ -76,7 +76,7 @@ $config = \Byteplus\Common\Configuration::getDefaultConfiguration()
 
     当服务在内置映射中标记 `goChinaEnabled=true`，并且请求 Region 属于中国大陆（`cn-*` 前缀且不属于 `cn-hongkong` 等非大陆港澳台 Region）时，在域名后追加 `.cn` 后缀。
 
-    是否 GoChina 由服务侧决定，不可修改。匹配前会先对 region 做 `strtolower(trim(...))` 归一化，因此 `CN-Beijing`、`  cn-beijing  ` 与 `cn-beijing` 等价。
+    是否 GoChina 由服务侧决定，不可修改。region 先按原值校验，通过后再执行 `strtolower(trim(...))` 归一化并参与匹配，因此 `CN-Beijing` 与 `cn-beijing` 的寻址结果相同。带首尾空白的 region（如 `"  cn-beijing  "`）在归一化之前就会以 `InvalidRegion` 被拒绝，参见 [region 首尾空白与兼容性](#region-首尾空白与兼容性)。
 
 4. **根据服务名和区域自动构造 Endpoint 地址**
 
@@ -133,6 +133,18 @@ try {
 
 遇到该错误时，建议先升级 SDK 版本；若确认 SDK 尚未内置该服务的寻址元数据，可通过 `Configuration::setHost(...)` 或自定义 Endpoint Provider 显式指定。
 
+#### region 首尾空白与兼容性
+
+默认自动寻址按原始 region 校验，不会先 `trim()`。`" ap-southeast-1"`、`"ap-southeast-1 "`、`"\tap-southeast-1"`、`"ap-southeast-1\n"` 和纯空白字符串都会抛出 `Byteplus\Common\ApiException`，`getErrorCode()` 为 `InvalidRegion`，状态码为 400。
+
+- 直接调用 `DefaultEndpointProvider::endpointFor(...)` 或 `getDefaultEndpoint(...)` 时同样拒绝首尾空白；合法 region 的大小写处理不变，默认寻址仍使用小写值构建主机名。
+- 未显式设置 `host` 时，客户端在调用任何 Endpoint Provider、签名和发送请求之前校验 region。`Configuration::setRegion(...)` 只保存原值，不会自动 trim，也不会在设置时立即执行这项校验。
+- `null` 和空字符串仍沿用各入口原有的空值处理；纯空白字符串不属于空字符串。
+
+**与旧版本不同：** 直接调用默认 Endpoint 解析接口时，不再接受首尾空白，而是抛出 `InvalidRegion`。旧版本默认寻址会先 trim 再构建主机名，但签名使用的仍是原始 region；寻址能够返回正确域名并不代表带空白的 region 可以正常完成客户端请求。
+
+如果业务需要容忍文本输入的首尾空白，应在调用 `setRegion(...)` 或直接解析接口之前自行 `trim()`，并将处理后的同一个 region 用于客户端配置和寻址。不要只清理传给 Endpoint Provider 的值而保留签名使用的原值；trim 后的值仍须通过合法性校验。
+
 #### Standard Endpoint Provider
 
 `Byteplus\Common\Endpoint\Providers\StandardEndpointProvider` 是可选的模板寻址器，通过 `Configuration::setEndpointProvider()` 配置；显式 `host` 仍有最高优先级。它使用独立的内置服务表。
@@ -168,9 +180,12 @@ try {
 - `['mysvc' => ['isGlobal' => false]]`：也支持 `IsGlobal` 键。
 - `['mysvc' => (object) ['IsGlobal' => true]]`：也支持公开的 `isGlobal` 属性；还支持 `new \Byteplus\Common\Endpoint\Providers\ServiceInfo('mysvc', true)`。
 
-异常类型为 `StandProviderError`，通过 `getStandCode()` 获取符号错误码，而非数值 `getCode()`：
-service 或 region 非字符串/纯空白时报 `InvalidArgument`；region 格式不支持时报 `InvalidRegion`；服务未注册时报 `ServiceNotFound`；自定义条目形态不支持时报 `InvalidCustomService`；占位符不存在时报 `TemplateExecuteError`。
+非空的 service 或 region 若不是合法的 endpoint 标签（只能包含 ASCII 字母、数字、`-` 和 `_`，以字母开头，且不以 `-` 或 `_` 结尾），会在拼接 host 之前抛出 `Byteplus\Common\ApiException`，通过 `getErrorCode()` 获取错误码 `InvalidService`/`InvalidRegion`，状态码 400；默认和标准 Provider 都会执行这项校验；未显式设置 host 时，客户端请求路径也会在调用任何 endpoint Provider 之前执行这项校验。
+其他错误的异常类型为 `StandProviderError`，通过 `getStandCode()` 获取符号错误码，而非数值 `getCode()`：
+service 或 region 非字符串/纯空白时报 `InvalidArgument`（客户端请求路径上，`' '`、`1` 这类非空值会先抛出上述 `ApiException`）；region 格式不支持时报 `InvalidRegion`；服务未注册时报 `ServiceNotFound`；自定义条目形态不支持时报 `InvalidCustomService`；占位符不存在时报 `TemplateExecuteError`。
 这不是完整的域名合法性校验，调用方仍须保证模板字面量和替换值适合作为域名。
+
+**与旧版本不同：** 使用 Standard Provider 时（直接调用 `endpointFor()`，或通过配置了它的客户端发请求），service 或 region 含非法字符（如 `ap-southeast-1.evil.com`、`x@127.0.0.1#`、带首尾空白的 `" ap-southeast-1"`、`ecs.evil.com`）抛出的异常由 `StandProviderError` 改为 `Byteplus\Common\ApiException`，状态码 400，错误码改由 `getErrorCode()` 获取（`InvalidRegion` / `InvalidService`），不再通过 `getStandCode()`；旧版本对这类 service 报的是 `ServiceNotFound`。`ApiException` 与 `StandProviderError` 没有继承关系，只捕获 `StandProviderError` 的代码需要同时捕获 `ApiException`，或改为捕获二者共同的父类 `\Exception`。空值或纯空白、服务未注册、格式合法但不受支持的 region（如 `AP-SOUTHEAST-1`）仍抛出 `StandProviderError`，与旧版本相同。
 
 DualStack 优先使用显式 `true`/`false`，`null` 时读取 `BYTEPLUS_ENABLE_DUALSTACK`。`customBootstrapRegion` 不参与寻址。
 与默认 Provider 不同，Standard 没有服务级 `goChinaEnabled` 标志，`CNSuffix` 采用上表规则。
