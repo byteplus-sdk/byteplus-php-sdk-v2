@@ -28,7 +28,7 @@ class CreateRegistryResponse implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        
+        'name' => 'string'
     ];
 
     /**
@@ -37,7 +37,7 @@ class CreateRegistryResponse implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        
+        'name' => null
     ];
 
     /**
@@ -67,7 +67,7 @@ class CreateRegistryResponse implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        
+        'name' => 'Name'
     ];
 
     /**
@@ -76,7 +76,7 @@ class CreateRegistryResponse implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        
+        'name' => 'setName'
     ];
 
     /**
@@ -85,7 +85,7 @@ class CreateRegistryResponse implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        
+        'name' => 'getName'
     ];
 
     /**
@@ -119,16 +119,6 @@ class CreateRegistryResponse implements ModelInterface, ArrayAccess
         return self::$getters;
     }
 
-    /**
-     * The original name of the model.
-     *
-     * @return string
-     */
-    public function getModelName()
-    {
-        return self::$swaggerModelName;
-    }
-
     
 
     
@@ -148,6 +138,7 @@ class CreateRegistryResponse implements ModelInterface, ArrayAccess
      */
     public function __construct($data = null)
     {
+        $this->container['name'] = isset($data['name']) ? $data['name'] : null;
     }
 
     /**
@@ -173,6 +164,30 @@ class CreateRegistryResponse implements ModelInterface, ArrayAccess
         return count($this->listInvalidProperties()) === 0;
     }
 
+
+    /**
+     * Gets name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->container['name'];
+    }
+
+    /**
+     * Sets name
+     *
+     * @param string $name name
+     *
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->container['name'] = $name;
+
+        return $this;
+    }
     /**
      * Returns true if offset exists. False otherwise.
      *

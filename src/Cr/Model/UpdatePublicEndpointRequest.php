@@ -28,6 +28,7 @@ class UpdatePublicEndpointRequest implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
+        'client_token' => 'string',
         'enabled' => 'bool',
         'registry' => 'string'
     ];
@@ -38,6 +39,7 @@ class UpdatePublicEndpointRequest implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
+        'client_token' => null,
         'enabled' => null,
         'registry' => null
     ];
@@ -69,6 +71,7 @@ class UpdatePublicEndpointRequest implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
+        'client_token' => 'ClientToken',
         'enabled' => 'Enabled',
         'registry' => 'Registry'
     ];
@@ -79,6 +82,7 @@ class UpdatePublicEndpointRequest implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $setters = [
+        'client_token' => 'setClientToken',
         'enabled' => 'setEnabled',
         'registry' => 'setRegistry'
     ];
@@ -89,6 +93,7 @@ class UpdatePublicEndpointRequest implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $getters = [
+        'client_token' => 'getClientToken',
         'enabled' => 'getEnabled',
         'registry' => 'getRegistry'
     ];
@@ -124,16 +129,6 @@ class UpdatePublicEndpointRequest implements ModelInterface, ArrayAccess
         return self::$getters;
     }
 
-    /**
-     * The original name of the model.
-     *
-     * @return string
-     */
-    public function getModelName()
-    {
-        return self::$swaggerModelName;
-    }
-
     
 
     
@@ -153,6 +148,7 @@ class UpdatePublicEndpointRequest implements ModelInterface, ArrayAccess
      */
     public function __construct($data = null)
     {
+        $this->container['client_token'] = isset($data['client_token']) ? $data['client_token'] : null;
         $this->container['enabled'] = isset($data['enabled']) ? $data['enabled'] : null;
         $this->container['registry'] = isset($data['registry']) ? $data['registry'] : null;
     }
@@ -183,6 +179,30 @@ class UpdatePublicEndpointRequest implements ModelInterface, ArrayAccess
         return count($this->listInvalidProperties()) === 0;
     }
 
+
+    /**
+     * Gets client_token
+     *
+     * @return string
+     */
+    public function getClientToken()
+    {
+        return $this->container['client_token'];
+    }
+
+    /**
+     * Sets client_token
+     *
+     * @param string $client_token client_token
+     *
+     * @return $this
+     */
+    public function setClientToken($client_token)
+    {
+        $this->container['client_token'] = $client_token;
+
+        return $this;
+    }
 
     /**
      * Gets enabled

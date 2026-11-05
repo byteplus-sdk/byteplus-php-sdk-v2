@@ -55,7 +55,7 @@ class DefaultEndpointProvider extends EndpointProvider
             'resource_share' => new ServiceEndpointInfo('resource_share', true, false),
             'vmp'            => new ServiceEndpointInfo('vmp', false, true),
             'tag'            => new ServiceEndpointInfo('tag', true, false),
-            'cr'             => new ServiceEndpointInfo('cr', false, true),
+            'cr' => new ServiceEndpointInfo('cr', false, true),
             'alb'            => new ServiceEndpointInfo('alb', false, true),
             'sts'            => new ServiceEndpointInfo('sts', false, true),
             'hbase'          => new ServiceEndpointInfo('hbase', false, true),
