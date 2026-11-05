@@ -30,6 +30,7 @@ class FilterForListRegistriesInput implements ModelInterface, ArrayAccess
     protected static $swaggerTypes = [
         'names' => 'string[]',
         'projects' => 'string[]',
+        'proxy_cache_enabled' => 'bool',
         'statuses' => '\Byteplus\Cr\Model\StatusForListRegistriesInput[]',
         'types' => 'string[]'
     ];
@@ -42,6 +43,7 @@ class FilterForListRegistriesInput implements ModelInterface, ArrayAccess
     protected static $swaggerFormats = [
         'names' => null,
         'projects' => null,
+        'proxy_cache_enabled' => null,
         'statuses' => null,
         'types' => null
     ];
@@ -75,6 +77,7 @@ class FilterForListRegistriesInput implements ModelInterface, ArrayAccess
     protected static $attributeMap = [
         'names' => 'Names',
         'projects' => 'Projects',
+        'proxy_cache_enabled' => 'ProxyCacheEnabled',
         'statuses' => 'Statuses',
         'types' => 'Types'
     ];
@@ -87,6 +90,7 @@ class FilterForListRegistriesInput implements ModelInterface, ArrayAccess
     protected static $setters = [
         'names' => 'setNames',
         'projects' => 'setProjects',
+        'proxy_cache_enabled' => 'setProxyCacheEnabled',
         'statuses' => 'setStatuses',
         'types' => 'setTypes'
     ];
@@ -99,6 +103,7 @@ class FilterForListRegistriesInput implements ModelInterface, ArrayAccess
     protected static $getters = [
         'names' => 'getNames',
         'projects' => 'getProjects',
+        'proxy_cache_enabled' => 'getProxyCacheEnabled',
         'statuses' => 'getStatuses',
         'types' => 'getTypes'
     ];
@@ -134,16 +139,6 @@ class FilterForListRegistriesInput implements ModelInterface, ArrayAccess
         return self::$getters;
     }
 
-    /**
-     * The original name of the model.
-     *
-     * @return string
-     */
-    public function getModelName()
-    {
-        return self::$swaggerModelName;
-    }
-
     
 
     
@@ -165,6 +160,7 @@ class FilterForListRegistriesInput implements ModelInterface, ArrayAccess
     {
         $this->container['names'] = isset($data['names']) ? $data['names'] : null;
         $this->container['projects'] = isset($data['projects']) ? $data['projects'] : null;
+        $this->container['proxy_cache_enabled'] = isset($data['proxy_cache_enabled']) ? $data['proxy_cache_enabled'] : null;
         $this->container['statuses'] = isset($data['statuses']) ? $data['statuses'] : null;
         $this->container['types'] = isset($data['types']) ? $data['types'] : null;
     }
@@ -237,6 +233,30 @@ class FilterForListRegistriesInput implements ModelInterface, ArrayAccess
     public function setProjects($projects)
     {
         $this->container['projects'] = $projects;
+
+        return $this;
+    }
+
+    /**
+     * Gets proxy_cache_enabled
+     *
+     * @return bool
+     */
+    public function getProxyCacheEnabled()
+    {
+        return $this->container['proxy_cache_enabled'];
+    }
+
+    /**
+     * Sets proxy_cache_enabled
+     *
+     * @param bool $proxy_cache_enabled proxy_cache_enabled
+     *
+     * @return $this
+     */
+    public function setProxyCacheEnabled($proxy_cache_enabled)
+    {
+        $this->container['proxy_cache_enabled'] = $proxy_cache_enabled;
 
         return $this;
     }

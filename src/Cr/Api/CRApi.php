@@ -378,6 +378,68 @@ class CRApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function createTag($body = null)
+    {
+        list($response) = $this->createTagWithHttpInfo($body);
+        return $response;
+    }
+
+    public function createTagWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Cr\Model\CreateTagResponse';
+        $request = $this->createTagRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function createTagAsync($body = null)
+    {
+        return $this->createTagAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function createTagAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Cr\Model\CreateTagResponse';
+        $request = $this->createTagRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function createTagRequest($body)
+    {
+        $resourcePath = '/CreateTag/2022-05-12/cr/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function deleteEndpointAclPolicies($body = null)
     {
         list($response) = $this->deleteEndpointAclPoliciesWithHttpInfo($body);
@@ -1556,6 +1618,68 @@ class CRApi
         return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
     }
 
+    public function updateRegistry($body = null)
+    {
+        list($response) = $this->updateRegistryWithHttpInfo($body);
+        return $response;
+    }
+
+    public function updateRegistryWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Cr\Model\UpdateRegistryResponse';
+        $request = $this->updateRegistryRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function updateRegistryAsync($body = null)
+    {
+        return $this->updateRegistryAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function updateRegistryAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Cr\Model\UpdateRegistryResponse';
+        $request = $this->updateRegistryRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function updateRegistryRequest($body)
+    {
+        $resourcePath = '/UpdateRegistry/2022-05-12/cr/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
     public function updateRepository($body = null)
     {
         list($response) = $this->updateRepositoryWithHttpInfo($body);
@@ -1714,6 +1838,68 @@ class CRApi
     protected function updateRobotAccountPasswordRequest($body)
     {
         $resourcePath = '/UpdateRobotAccountPassword/2022-05-12/cr/post/application_json/';
+        $queryParams = [];
+        $httpBody = $body;
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json'],
+            ['application/json']
+        );
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+        if ($this->config->getHost()) {
+            $defaultHeaders['Host'] = $this->config->getHost();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headers
+        );
+
+        $paths = explode("/", $resourcePath);
+        $service = $paths[3];
+        $method = strtoupper($paths[4]);
+
+        return ['resourcePath' => $resourcePath, 'headers' => $headers, 'method' => $method];
+    }
+
+    public function updateTagDescription($body = null)
+    {
+        list($response) = $this->updateTagDescriptionWithHttpInfo($body);
+        return $response;
+    }
+
+    public function updateTagDescriptionWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Cr\Model\UpdateTagDescriptionResponse';
+        $request = $this->updateTagDescriptionRequest($body);
+
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType);
+    }
+
+    public function updateTagDescriptionAsync($body = null)
+    {
+        return $this->updateTagDescriptionAsyncWithHttpInfo($body)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    public function updateTagDescriptionAsyncWithHttpInfo($body)
+    {
+        $returnType = '\Byteplus\Cr\Model\UpdateTagDescriptionResponse';
+        $request = $this->updateTagDescriptionRequest($body);
+        return $this->apiClient->callApi($body, $request['resourcePath'], $request['method'], $request['headers'], $returnType, true);
+    }
+
+    protected function updateTagDescriptionRequest($body)
+    {
+        $resourcePath = '/UpdateTagDescription/2022-05-12/cr/post/application_json/';
         $queryParams = [];
         $httpBody = $body;
 
