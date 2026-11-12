@@ -70,7 +70,7 @@ class DefaultEndpointProvider extends EndpointProvider
             'cen'            => new ServiceEndpointInfo('cen', true, false),
             'cp'             => new ServiceEndpointInfo('cp', false, false),
             'cloudmonitor'   => new ServiceEndpointInfo('cloudmonitor', false, true),
-            'eco_partner'    => new ServiceEndpointInfo('eco_partner', true, false),
+            'eco_partner' => new ServiceEndpointInfo('eco_partner', true, false),
             'milvus'         => new ServiceEndpointInfo('milvus', false, false),
             'llmshield'      => new ServiceEndpointInfo('llmshield', false, false),
             'billing' => new ServiceEndpointInfo('billing', true, true),
