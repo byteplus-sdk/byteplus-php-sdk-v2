@@ -75,7 +75,7 @@ class DefaultEndpointProvider extends EndpointProvider
             'llmshield'      => new ServiceEndpointInfo('llmshield', false, false),
             'billing' => new ServiceEndpointInfo('billing', true, true),
             'id'             => new ServiceEndpointInfo('id', false, false),
-            'clawsentry'     => new ServiceEndpointInfo('clawsentry', false, false),
+            'clawsentry' => new ServiceEndpointInfo('clawsentry', false, false),
             'resourcecenter' => new ServiceEndpointInfo('resourcecenter', true, false),
             'escloud'        => new ServiceEndpointInfo('escloud', false, false),
             'cpaas'          => new ServiceEndpointInfo('cpaas', true, false),
